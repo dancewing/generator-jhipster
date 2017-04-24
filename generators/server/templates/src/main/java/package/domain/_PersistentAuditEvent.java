@@ -24,7 +24,11 @@ import org.springframework.data.mongodb.core.mapping.Field;<% } %>
 
 import java.io.Serializable;
 import java.time.LocalDateTime;<% if (databaseType == 'sql') { %>
-import javax.persistence.*;<% } %>
+import javax.persistence.*;
+<%_ if (primaryKeyType == 'UUID') { _%>
+import org.hibernate.annotations.GenericGenerator;
+<%_ } _%>
+<% } %>
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,14 +43,22 @@ import java.util.Map;
 public class PersistentAuditEvent implements Serializable {
 
     @Id<% if (databaseType == 'sql') { %>
-    <%_ if (prodDatabaseType == 'mysql' || prodDatabaseType == 'mariadb') { _%>
+    <%_ if (primaryKeyType == 'IDENTITY') { _%>
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    <%_ }  else { _%>
+    @Column(name = "event_id")
+    private Long id;
+    <%_ }  else if (primaryKeyType == 'SEQUENCE') { _%>
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
     @SequenceGenerator(name = "sequenceGenerator")
-    <%_ } _%>
     @Column(name = "event_id")
-    private Long id;<% } else { %>
+    private Long id;
+    <%_ } else if (primaryKeyType == 'UUID') { _%>
+    @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    @Column(name = "event_id")
+    private String id;
+    <%_ } _%>
+    <% } else { %>
     @Field("event_id")
     private String id;<% } %>
 
@@ -66,11 +78,11 @@ public class PersistentAuditEvent implements Serializable {
     @CollectionTable(name = "jhi_persistent_audit_evt_data", joinColumns=@JoinColumn(name="event_id"))<% } %>
     private Map<String, String> data = new HashMap<>();
 <% if (databaseType == 'sql') { %>
-    public Long getId() {
+    public <% if (primaryKeyType != 'UUID') { %>Long<% } else { %>String<%}%> getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(<% if (primaryKeyType != 'UUID') { %>Long<% } else { %>String<%}%> id) {
         this.id = id;
     }<% } else { %>
     public String getId() {

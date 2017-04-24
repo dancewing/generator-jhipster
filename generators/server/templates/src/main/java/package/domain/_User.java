@@ -39,7 +39,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 <%_ if (databaseType == 'sql') { _%>
 import javax.persistence.*;
+<%_ if (primaryKeyType == 'UUID') { _%>
+import org.hibernate.annotations.GenericGenerator;  
 <%_ } _%>
+<%_ } _%>
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -61,15 +65,19 @@ import java.time.ZonedDateTime;<% } %>
 public class User<% if (databaseType == 'sql' || databaseType == 'mongodb') { %> extends AbstractAuditingEntity<% } %> implements Serializable {
 
     private static final long serialVersionUID = 1L;
-<% if (databaseType == 'sql') { %>
+    <% if (databaseType == 'sql') { %>
     @Id
-    <%_ if (prodDatabaseType == 'mysql' || prodDatabaseType == 'mariadb') { _%>
+    <%_ if (primaryKeyType == 'IDENTITY') { _%>
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    <%_ }  else { _%>
+    private Long id;
+    <%_ }  else if (primaryKeyType == 'SEQUENCE') { _%>
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
     @SequenceGenerator(name = "sequenceGenerator")
-    <%_ } _%>
-    private Long id;<% } %><% if (databaseType == 'mongodb') { %>
+    private Long id;
+    <%_ } else if (primaryKeyType == 'UUID') { _%>
+    @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    private String id;<% }} %><% if (databaseType == 'mongodb') { %>
     @Id
     private String id;<% } %><% if (databaseType == 'cassandra') { %>
     @PartitionKey
@@ -163,11 +171,11 @@ public class User<% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)<% } %>
     private Set<PersistentToken> persistentTokens = new HashSet<>();<% } %>
 
-    public <% if (databaseType == 'sql') { %>Long<% } else if (databaseType == 'mongodb' || databaseType == 'cassandra') { %>String<% } %> getId() {
+    public <% if (databaseType == 'sql') { %><%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%><% } else if (databaseType == 'mongodb' || databaseType == 'cassandra') { %>String<% } %> getId() {
         return id;
     }
 
-    public void setId(<% if (databaseType == 'sql') { %>Long<% } else if (databaseType == 'mongodb' || databaseType == 'cassandra') { %>String<% } %> id) {
+    public void setId(<% if (databaseType == 'sql') { %><%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%><% } else if (databaseType == 'mongodb' || databaseType == 'cassandra') { %>String<% } %> id) {
         this.id = id;
     }
 

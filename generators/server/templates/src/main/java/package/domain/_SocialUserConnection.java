@@ -30,8 +30,10 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 <%_ } _%>
 <%_ if (databaseType == 'sql') { _%>
-
 import javax.persistence.*;
+<%_ if (primaryKeyType == 'UUID') { _%>
+import org.hibernate.annotations.GenericGenerator;
+<%_ } _%>
 <%_ } _%>
 import javax.validation.constraints.NotNull;
 <%_ if (databaseType == 'mongodb') { _%>
@@ -55,13 +57,17 @@ public class SocialUserConnection implements Serializable {
     private static final long serialVersionUID = 1L;
 <% if (databaseType == 'sql') { %>
     @Id
-    <%_ if (prodDatabaseType == 'mysql' || prodDatabaseType == 'mariadb') { _%>
+    <%_ if (primaryKeyType == 'IDENTITY') { _%>
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    <%_ }  else { _%>
+    private Long id;
+    <%_ }  else if (primaryKeyType == 'SEQUENCE') { _%>
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
     @SequenceGenerator(name = "sequenceGenerator")
-    <%_ } _%>
-    private Long id;<% } %><% if (databaseType == 'mongodb') { %>
+    private Long id;
+    <%_ } else if (primaryKeyType == 'UUID') { _%>
+    @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    private String id;<% }} %><% if (databaseType == 'mongodb') { %>
     @Id
     private String id;<% } %>
 
@@ -146,11 +152,11 @@ public class SocialUserConnection implements Serializable {
         this.expireTime = expireTime;
     }
 
-    public <% if (databaseType == 'sql') { %>Long<% } else if (databaseType == 'mongodb') { %>String<% } %> getId() {
+    public <% if (databaseType == 'sql') { %><%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%><% } else if (databaseType == 'mongodb') { %>String<% } %> getId() {
         return id;
     }
 
-    public void setId(<% if (databaseType == 'sql') { %>Long<% } else if (databaseType == 'mongodb') { %>String<% } %> id) {
+    public void setId(<% if (databaseType == 'sql') { %><%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%><% } else if (databaseType == 'mongodb') { %>String<% } %> id) {
         this.id = id;
     }
 

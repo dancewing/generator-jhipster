@@ -347,6 +347,30 @@ function askForServerSideOpts() {
         {
             when: response => response.databaseType === 'sql',
             type: 'list',
+            name: 'primaryKeyType',
+            message: response => this.getNumberedQuestion(
+                'Which *primary key type* of database would you like to use?',
+                response.databaseType === 'sql'
+            ),
+            choices: [
+                {
+                    value: 'IDENTITY',
+                    name: 'IDENTITY'
+                },
+                {
+                    value: 'SEQUENCE',
+                    name: 'SEQUENCE'
+                },
+                {
+                    value: 'UUID',
+                    name: 'UUID'
+                }
+            ],
+            default: 1
+        },
+        {
+            when: response => response.databaseType === 'sql',
+            type: 'list',
             name: 'hibernateCache',
             message: response => this.getNumberedQuestion('Do you want to use Hibernate 2nd level cache?', response.databaseType === 'sql'),
             choices: [
@@ -410,6 +434,7 @@ function askForServerSideOpts() {
         }
         this.hibernateCache = props.hibernateCache;
         this.databaseType = props.databaseType;
+        this.primaryKeyType = props.primaryKeyType;
         this.devDatabaseType = props.devDatabaseType;
         this.prodDatabaseType = props.prodDatabaseType;
         this.searchEngine = props.searchEngine;

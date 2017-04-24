@@ -106,6 +106,7 @@ module.exports = EntityGenerator.extend({
             this.authenticationType = this.config.get('authenticationType');
             this.hibernateCache = this.config.get('hibernateCache');
             this.databaseType = this.config.get('databaseType');
+            this.primaryKeyType =  this.config.get('primaryKeyType');
             this.prodDatabaseType = this.config.get('prodDatabaseType');
             this.searchEngine = this.config.get('searchEngine') === 'no' ? false : this.config.get('searchEngine');
             this.messageBroker = this.config.get('messageBroker') === 'no' ? false : this.config.get('messageBroker');

@@ -142,6 +142,7 @@ module.exports = JhipsterServerGenerator.extend({
             }
 
             this.databaseType = this.config.get('databaseType');
+            this.primaryKeyType = this.config.get('primaryKeyType');
             if (this.databaseType === 'mongodb') {
                 this.devDatabaseType = 'mongodb';
                 this.prodDatabaseType = 'mongodb';
@@ -270,6 +271,7 @@ module.exports = JhipsterServerGenerator.extend({
             this.configOptions.clusteredHttpSession = this.clusteredHttpSession;
             this.configOptions.websocket = this.websocket;
             this.configOptions.databaseType = this.databaseType;
+            this.configOptions.primaryKeyType = this.primaryKeyType;
             this.configOptions.devDatabaseType = this.devDatabaseType;
             this.configOptions.prodDatabaseType = this.prodDatabaseType;
             this.configOptions.searchEngine = this.searchEngine;
@@ -347,6 +349,7 @@ module.exports = JhipsterServerGenerator.extend({
             this.config.set('clusteredHttpSession', this.clusteredHttpSession);
             this.config.set('websocket', this.websocket);
             this.config.set('databaseType', this.databaseType);
+            this.config.set('primaryKeyType', this.primaryKeyType);
             this.config.set('devDatabaseType', this.devDatabaseType);
             this.config.set('prodDatabaseType', this.prodDatabaseType);
             this.config.set('searchEngine', this.searchEngine);

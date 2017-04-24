@@ -33,7 +33,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;<% } %><% if (searchEngine == 'elasticsearch') { %>
 import org.springframework.data.elasticsearch.annotations.Document;<% } %>
 <% if (databaseType == 'sql') { %>
-import javax.persistence.*;<% } %><% if (validation) { %>
+import javax.persistence.*;
+<%_ if (primaryKeyType == 'UUID') { _%>
+import org.hibernate.annotations.GenericGenerator;
+<%_ } _%>
+<% } %><% if (validation) { %>
 import javax.validation.constraints.*;<% } %>
 import java.io.Serializable;<% if (fieldsContainBigDecimal == true) { %>
 import java.math.BigDecimal;<% } %><% if (fieldsContainBlob && databaseType === 'cassandra') { %>
@@ -67,13 +71,17 @@ public class <%= entityClass %> implements Serializable {
     private static final long serialVersionUID = 1L;
 <% if (databaseType == 'sql') { %>
     @Id
-    <%_ if (prodDatabaseType == 'mysql' || prodDatabaseType == 'mariadb') { _%>
+    <%_ if (primaryKeyType == 'IDENTITY') { _%>
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    <%_ }  else { _%>
+    private Long id;
+    <%_ }  else if (primaryKeyType == 'SEQUENCE') { _%>
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
     @SequenceGenerator(name = "sequenceGenerator")
-    <%_ } _%>
-    private Long id;<% } %><% if (databaseType == 'mongodb') { %>
+    private Long id;
+    <%_ } else if (primaryKeyType == 'UUID') {_%>
+    @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    private String id;<% }} %><% if (databaseType == 'mongodb') { %>
     @Id
     private String id;<% } %><% if (databaseType == 'cassandra') { %>
     @PartitionKey
@@ -208,11 +216,11 @@ public class <%= entityClass %> implements Serializable {
     private <%= otherEntityNameCapitalized %> <%= relationshipFieldName %>;
 
     <%_ } } _%>
-    public <% if (databaseType == 'sql') { %>Long<% } %><% if (databaseType == 'mongodb') { %>String<% } %><% if (databaseType == 'cassandra') { %>UUID<% } %> getId() {
+    public <% if (databaseType == 'sql') { %><%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%><% } %><% if (databaseType == 'mongodb') { %>String<% } %><% if (databaseType == 'cassandra' || primaryKeyType == 'UUID') { %>UUID<% } %> getId() {
         return id;
     }
 
-    public void setId(<% if (databaseType == 'sql') { %>Long<% } %><% if (databaseType == 'mongodb') { %>String<% } %><% if (databaseType == 'cassandra') { %>UUID<% } %> id) {
+    public void setId(<% if (databaseType == 'sql') { %><%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%><% } %><% if (databaseType == 'mongodb') { %>String<% } %><% if (databaseType == 'cassandra' || primaryKeyType == 'UUID') { %>UUID<% } %> id) {
         this.id = id;
     }
 <%_ for (idx in fields) {

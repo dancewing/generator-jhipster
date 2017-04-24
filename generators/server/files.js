@@ -16,6 +16,7 @@ module.exports = {
 };
 
 let javaDir;
+let uuidV4 = require('uuid/v4');
 
 function writeFiles() {
     return {
@@ -472,9 +473,20 @@ function writeFiles() {
 
             /* User management resources files */
             if (this.databaseType === 'sql') {
+                if (this.primaryKeyType === 'UUID') {
+                  this.userId_1 = uuidV4().replace(/-/g,'');
+                  this.userId_2 = uuidV4().replace(/-/g,'');
+                  this.userId_3 = uuidV4().replace(/-/g,'');
+                  this.userId_4 = uuidV4().replace(/-/g,'');
+                } else {
+                  this.userId_1 = 1;
+                  this.userId_2 = 2;
+                  this.userId_3 = 3;
+                  this.userId_4 = 4;
+                }
                 this.template(`${SERVER_MAIN_RES_DIR}config/liquibase/users.csv`, `${SERVER_MAIN_RES_DIR}config/liquibase/users.csv`);
                 this.copy(`${SERVER_MAIN_RES_DIR}config/liquibase/authorities.csv`, `${SERVER_MAIN_RES_DIR}config/liquibase/authorities.csv`);
-                this.copy(`${SERVER_MAIN_RES_DIR}config/liquibase/users_authorities.csv`, `${SERVER_MAIN_RES_DIR}config/liquibase/users_authorities.csv`);
+                this.template(`${SERVER_MAIN_RES_DIR}config/liquibase/users_authorities.csv`, `${SERVER_MAIN_RES_DIR}config/liquibase/users_authorities.csv`);
                 if (this.authenticationType === 'oauth2') {
                     this.template(`${SERVER_MAIN_RES_DIR}config/liquibase/oauth_client_details.csv`, `${SERVER_MAIN_RES_DIR}config/liquibase/oauth_client_details.csv`);
                 }
