@@ -71,7 +71,7 @@ for (idx in relationships) {
      * @return the entity instance
      */
      <%if(databaseType === 'sql') { %>
-    default <%= entityClass %> <%= entityInstance %>FromId(Long id) {
+    default <%= entityClass %> <%= entityInstance %>FromId(<%= pkType %>  id) {
         if (id == null) {
             return null;
         }

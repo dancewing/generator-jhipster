@@ -349,7 +349,7 @@ public class UserService {
     <%_ if (databaseType == 'sql') { _%>
     @Transactional(readOnly = true)
     <%_ } _%>
-    public User getUserWithAuthorities(<%= pkType %> id) {
+    public User getUserWithAuthorities(<%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%>/**/ id) {
         <%_ if (databaseType == 'sql') { _%>
         return userRepository.findOneWithAuthoritiesById(id);
         <%_ } else { // MongoDB and Cassandra _%>

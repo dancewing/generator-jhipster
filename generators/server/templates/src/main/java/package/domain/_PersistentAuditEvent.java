@@ -54,7 +54,7 @@ public class PersistentAuditEvent implements Serializable {
     private Long id;
     <%_ } else if (primaryKeyType == 'UUID') { _%>
     @GeneratedValue(generator="system-uuid")
-    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid2")
     @Column(name = "event_id")
     private String id;
     <%_ } _%>

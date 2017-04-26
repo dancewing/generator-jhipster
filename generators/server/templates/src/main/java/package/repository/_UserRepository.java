@@ -64,7 +64,7 @@ import java.util.Optional;
  */
 <%_ } _%>
 <%_ if (databaseType === 'sql' || databaseType === 'mongodb') { _%>
-public interface UserRepository extends <% if (databaseType == 'sql') { %>JpaRepository<User, Long><% } %><% if (databaseType == 'mongodb') { %>MongoRepository<User, String><% } %> {
+public interface UserRepository extends <% if (databaseType == 'sql') { %>JpaRepository<User, <%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%>><% } %><% if (databaseType == 'mongodb') { %>MongoRepository<User, String><% } %> {
 
     Optional<User> findOneByActivationKey(String activationKey);
 
@@ -78,7 +78,7 @@ public interface UserRepository extends <% if (databaseType == 'sql') { %>JpaRep
     <%_ if (databaseType == 'sql') { _%>
 
     @EntityGraph(attributePaths = "authorities")
-    User findOneWithAuthoritiesById(<%= pkType %> id);
+    User findOneWithAuthoritiesById(<%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%>/**/ id);
 
     @EntityGraph(attributePaths = "authorities")
     Optional<User> findOneWithAuthoritiesByLogin(String login);

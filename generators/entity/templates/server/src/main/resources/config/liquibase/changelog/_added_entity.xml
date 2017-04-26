@@ -48,9 +48,16 @@
     -->
     <changeSet id="<%= changelogDate %>-1" author="jhipster">
         <createTable tableName="<%= entityTableName %>">
-            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+            <%_ if (primaryKeyType == 'UUID') { _%>
+            <column name="id" type="<%=pkDBType%>">
                 <constraints primaryKey="true" nullable="false"/>
-            </column><% for (idx in fields) {
+            </column>
+            <%_ } else { _%>
+            <column name="id" type="<%=pkDBType%>" autoIncrement="${autoIncrement}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <%_ } _%>
+            <% for (idx in fields) {
             let nullable = true;
             if (fields[idx].fieldValidate == true && fields[idx].fieldValidateRules.indexOf('required') != -1) {
                 nullable = false;
@@ -103,7 +110,8 @@
                 <constraints nullable="<%= nullable %>" />
             </column>
             <%_ }  _%>
-            <%_ } _%><% for (idx in relationships) {
+            <%_ } _%>
+            <% for (idx in relationships) {
                 let nullable_relation = true,
                 relationshipType = relationships[idx].relationshipType,
                 relationshipName = relationships[idx].relationshipName;
@@ -111,11 +119,11 @@
                     nullable_relation = false;
                 }
                 if (relationships[idx].relationshipType === 'many-to-one') { %>
-            <column name="<%=getColumnName(relationshipName) %>_id" type="bigint">
+            <column name="<%=getColumnName(relationshipName) %>_id" type="<%=pkDBType%>">
                 <constraints nullable="<%= nullable_relation %>" />
             </column>
             <%_ } else if (relationshipType === 'one-to-one' && relationships[idx].ownerSide === true) { _%>
-            <column name="<%=getColumnName(relationshipName) %>_id" type="bigint">
+            <column name="<%=getColumnName(relationshipName) %>_id" type="<%=pkDBType%>">
                 <constraints unique="true" nullable="<%= nullable_relation %>" />
             </column><% } %><% } %>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
@@ -135,10 +143,10 @@
           _%>
 
         <createTable tableName="<%= joinTableName %>">
-            <column name="<%= getPluralColumnName(relationshipName) %>_id" type="bigint">
+            <column name="<%= getPluralColumnName(relationshipName) %>_id" type="<%=pkDBType%>">
                 <constraints nullable="false"/>
             </column>
-            <column name="<%= getPluralColumnName(name) %>_id" type="bigint">
+            <column name="<%= getPluralColumnName(name) %>_id" type="<%=pkDBType%>">
                 <constraints nullable="false"/>
             </column>
         </createTable>

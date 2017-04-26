@@ -80,7 +80,7 @@ public class <%= entityClass %> implements Serializable {
     private Long id;
     <%_ } else if (primaryKeyType == 'UUID') {_%>
     @GeneratedValue(generator="system-uuid")
-    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid2")
     private String id;<% }} %><% if (databaseType == 'mongodb') { %>
     @Id
     private String id;<% } %><% if (databaseType == 'cassandra') { %>
@@ -216,11 +216,11 @@ public class <%= entityClass %> implements Serializable {
     private <%= otherEntityNameCapitalized %> <%= relationshipFieldName %>;
 
     <%_ } } _%>
-    public <% if (databaseType == 'sql') { %><%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%><% } %><% if (databaseType == 'mongodb') { %>String<% } %><% if (databaseType == 'cassandra' || primaryKeyType == 'UUID') { %>UUID<% } %> getId() {
+    public <% if (databaseType == 'sql') { %><%= pkType %><% } %><% if (databaseType == 'mongodb') { %>String<% } %><% if (databaseType == 'cassandra') { %>UUID<% } %> getId() {
         return id;
     }
 
-    public void setId(<% if (databaseType == 'sql') { %><%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%><% } %><% if (databaseType == 'mongodb') { %>String<% } %><% if (databaseType == 'cassandra' || primaryKeyType == 'UUID') { %>UUID<% } %> id) {
+    public void setId(<% if (databaseType == 'sql') { %><%= pkType %><% } %><% if (databaseType == 'mongodb') { %>String<% } %><% if (databaseType == 'cassandra') { %>UUID<% } %> id) {
         this.id = id;
     }
 <%_ for (idx in fields) {

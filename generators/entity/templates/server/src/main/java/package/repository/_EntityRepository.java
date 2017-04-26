@@ -55,7 +55,7 @@ public interface <%=entityClass%>Repository extends <% if (databaseType=='sql') 
 
     @Query("select <%= entityInstance %> from <%= entityClass %> <%= entityInstance %><% for (idx in relationships) {
     if (relationships[idx].relationshipType == 'many-to-many' && relationships[idx].ownerSide == true) { %> left join fetch <%=entityInstance%>.<%=relationships[idx].relationshipFieldNamePlural%><%} }%> where <%=entityInstance%>.id =:id")
-    <%=entityClass%> findOneWithEagerRelationships(@Param("id") Long id);
+    <%=entityClass%> findOneWithEagerRelationships(@Param("id") <%= pkType %> id);
 <% } %>
 }<% } %><% if (databaseType == 'cassandra') { %>
 @Repository

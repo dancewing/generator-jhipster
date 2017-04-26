@@ -656,8 +656,15 @@ module.exports = EntityGenerator.extend({
 
             if (this.databaseType === 'cassandra' || this.databaseType === 'mongodb') {
                 this.pkType = 'String';
+                this.pkDBType = 'varchar(36)';
             } else {
-                this.pkType = 'Long';
+                if (this.primaryKeyType === 'UUID') {
+                  this.pkType = 'String';
+                  this.pkDBType = 'varchar(36)';
+                } else {
+                  this.pkType = 'Long';
+                  this.pkDBType = 'bigint';
+                }
             }
         },
 

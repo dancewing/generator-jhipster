@@ -55,7 +55,7 @@ public interface UserMapper {
 
     List<User> userDTOsToUsers(List<UserDTO> userDTOs);
 
-    default User userFromId(<% if (databaseType == 'mongodb' || databaseType == 'cassandra') { %>String<% } else { %>Long<% } %> id) {
+    default User userFromId(<% if (databaseType == 'mongodb' || databaseType == 'cassandra' || primaryKeyType == 'UUID') { %>String<% } else { %>Long<% } %> id) {
         if (id == null) {
             return null;
         }

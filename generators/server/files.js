@@ -474,10 +474,10 @@ function writeFiles() {
             /* User management resources files */
             if (this.databaseType === 'sql') {
                 if (this.primaryKeyType === 'UUID') {
-                  this.userId_1 = uuidV4().replace(/-/g,'');
-                  this.userId_2 = uuidV4().replace(/-/g,'');
-                  this.userId_3 = uuidV4().replace(/-/g,'');
-                  this.userId_4 = uuidV4().replace(/-/g,'');
+                  this.userId_1 = uuidV4();
+                  this.userId_2 = uuidV4();
+                  this.userId_3 = uuidV4();
+                  this.userId_4 = uuidV4();
                 } else {
                   this.userId_1 = 1;
                   this.userId_2 = 2;

@@ -40,7 +40,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 <%_ if (databaseType == 'sql') { _%>
 import javax.persistence.*;
 <%_ if (primaryKeyType == 'UUID') { _%>
-import org.hibernate.annotations.GenericGenerator;  
+import org.hibernate.annotations.GenericGenerator;
 <%_ } _%>
 <%_ } _%>
 
@@ -76,7 +76,7 @@ public class User<% if (databaseType == 'sql' || databaseType == 'mongodb') { %>
     private Long id;
     <%_ } else if (primaryKeyType == 'UUID') { _%>
     @GeneratedValue(generator="system-uuid")
-    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid2")
     private String id;<% }} %><% if (databaseType == 'mongodb') { %>
     @Id
     private String id;<% } %><% if (databaseType == 'cassandra') { %>

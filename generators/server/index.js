@@ -165,6 +165,18 @@ module.exports = JhipsterServerGenerator.extend({
             if (this.hibernateCache === undefined) {
                 this.hibernateCache = 'no';
             }
+            if (this.databaseType === 'cassandra' || this.databaseType === 'mongodb') {
+                this.pkType = 'String';
+                this.pkDBType = 'varchar(36)';
+            } else {
+                if (this.primaryKeyType === 'UUID') {
+                  this.pkType = 'String';
+                  this.pkDBType = 'varchar(36)';
+                } else {
+                  this.pkType = 'Long';
+                  this.pkDBType = 'bigint';
+                }
+            }
             this.clusteredHttpSession = this.config.get('clusteredHttpSession') === 'no' ? false : this.config.get('clusteredHttpSession');
             if (this.hibernateCache === 'ehcache') {
                 this.clusteredHttpSession = false; // cannot use HazelCast clusering AND ehcache
