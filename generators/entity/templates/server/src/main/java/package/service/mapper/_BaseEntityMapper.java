@@ -16,27 +16,23 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -%>
-import { Routes } from '@angular/router';
+package <%=packageName%>.service.mapper;
 
-import { UserRouteAccessService } from '../../shared';
-import { ErrorComponent } from './error.component';
+import java.util.List;
 
-export const errorRoute: Routes = [
-    {
-        path: 'error',
-        component: ErrorComponent,
-        data: {
-            authorities: [],
-            pageTitle: 'error.title'
-        },
-    },
-    {
-        path: 'accessdenied',
-        component: ErrorComponent,
-        data: {
-            authorities: [],
-            pageTitle: 'error.title',
-            error403: true
-        },
-    }
-];
+/**
+ * Contract for a generic dto to entity mapper.
+ @param <DTO> - DTO type parameter.
+ @param <ENTITY> - Entity type parameter.
+ */
+
+public interface EntityMapper <DTO, ENTITY> {
+
+    public ENTITY toEntity(DTO dto);
+
+    public DTO toDto(ENTITY entity);
+
+    public List <ENTITY> toEntity(List<DTO> dtoList);
+
+    public List <DTO> toDto(List<ENTITY> entityList);
+}
