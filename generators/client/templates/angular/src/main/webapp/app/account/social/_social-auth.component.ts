@@ -19,8 +19,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { JhiLanguageService } from 'ng-jhipster';
-import { AuthService, LoginService } from '../../shared';
+import { LoginService } from '../../shared';
 import { CookieService } from 'angular2-cookie/core';
 
 @Component({
@@ -30,13 +29,10 @@ import { CookieService } from 'angular2-cookie/core';
 export class SocialAuthComponent implements OnInit {
 
     constructor(
-        private jhiLanguageService: JhiLanguageService,
-        private Auth: AuthService,
         private loginService: LoginService,
         private cookieService: CookieService,
         private router: Router
     ) {
-        this.jhiLanguageService.setLocations(['social']);
     }
 
     ngOnInit() {
@@ -44,7 +40,6 @@ export class SocialAuthComponent implements OnInit {
         if (token.length) {
             this.loginService.loginWithToken(token, false).then(() => {
                     this.cookieService.remove('social-authentication');
-                    this.Auth.authorize(true);
                  }, () => {
                     this.router.navigate(['social-register'], {queryParams: {'success': 'false'}});
             });

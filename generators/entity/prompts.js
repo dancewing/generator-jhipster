@@ -1,3 +1,21 @@
+/**
+ * Copyright 2013-2017 the original author or authors.
+ *
+ * This file is part of the JHipster project, see https://jhipster.github.io/
+ * for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 const chalk = require('chalk');
 const path = require('path');
 const _ = require('lodash');
@@ -462,6 +480,10 @@ function askForField(done) {
                     name: 'LocalDate'
                 },
                 {
+                    value: 'Instant',
+                    name: 'Instant'
+                },
+                {
                     value: 'ZonedDateTime',
                     name: 'ZonedDateTime'
                 },
@@ -580,6 +602,10 @@ function askForField(done) {
                 {
                     value: 'LocalDate',
                     name: 'LocalDate (Warning: only compatible with Cassandra v3)'
+                },
+                {
+                    value: 'Instant',
+                    name: 'Instant'
                 },
                 {
                     value: 'ZonedDateTime',
@@ -724,6 +750,7 @@ function askForField(done) {
             when: response => response.fieldAdd === true &&
                     response.fieldValidate === true &&
                     (response.fieldType === 'LocalDate' ||
+                    response.fieldType === 'Instant' ||
                     response.fieldType === 'ZonedDateTime' ||
                     response.fieldType === 'UUID' ||
                     response.fieldType === 'Boolean' ||

@@ -1,3 +1,21 @@
+/**
+ * Copyright 2013-2017 the original author or authors.
+ *
+ * This file is part of the JHipster project, see https://jhipster.github.io/
+ * for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 const mkdirp = require('mkdirp');
 const cleanup = require('../cleanup');
 const constants = require('../generator-constants');
@@ -223,7 +241,6 @@ function writeFiles() {
             if (this.authenticationType === 'jwt') {
                 this.template(`${SERVER_MAIN_SRC_DIR}package/web/rest/vm/_LoginVM.java`, `${javaDir}web/rest/vm/LoginVM.java`);
                 this.template(`${SERVER_MAIN_SRC_DIR}package/web/rest/_UserJWTController.java`, `${javaDir}web/rest/UserJWTController.java`);
-                this.template(`${SERVER_MAIN_SRC_DIR}package/web/rest/_JWTToken.java`, `${javaDir}web/rest/JWTToken.java`);
             }
 
             if (this.authenticationType === 'oauth2') {
@@ -275,7 +292,6 @@ function writeFiles() {
             this.template(`${SERVER_MAIN_SRC_DIR}package/config/apidoc/_GatewaySwaggerResourcesProvider.java`, `${javaDir}config/apidoc/GatewaySwaggerResourcesProvider.java`);
             this.template(`${SERVER_MAIN_SRC_DIR}package/gateway/ratelimiting/_RateLimitingFilter.java`, `${javaDir}gateway/ratelimiting/RateLimitingFilter.java`);
             this.template(`${SERVER_MAIN_SRC_DIR}package/gateway/_TokenRelayFilter.java`, `${javaDir}gateway/TokenRelayFilter.java`);
-            this.template(`${SERVER_MAIN_SRC_DIR}package/gateway/ratelimiting/_RateLimitingRepository.java`, `${javaDir}gateway/ratelimiting/RateLimitingRepository.java`);
             this.template(`${SERVER_MAIN_SRC_DIR}package/gateway/accesscontrol/_AccessControlFilter.java`, `${javaDir}gateway/accesscontrol/AccessControlFilter.java`);
             this.template(`${SERVER_MAIN_SRC_DIR}package/gateway/responserewriting/_SwaggerBasePathRewritingFilter.java`, `${javaDir}gateway/responserewriting/SwaggerBasePathRewritingFilter.java`);
             this.template(`${SERVER_MAIN_SRC_DIR}package/web/rest/vm/_RouteVM.java`, `${javaDir}web/rest/vm/RouteVM.java`);
@@ -314,7 +330,7 @@ function writeFiles() {
 
             this.template(`${SERVER_MAIN_SRC_DIR}package/config/_package-info.java`, `${javaDir}config/package-info.java`);
             this.template(`${SERVER_MAIN_SRC_DIR}package/config/_AsyncConfiguration.java`, `${javaDir}config/AsyncConfiguration.java`);
-            if (this.hibernateCache === 'ehcache' || this.hibernateCache === 'hazelcast' || this.clusteredHttpSession === 'hazelcast') {
+            if (this.hibernateCache === 'ehcache' || this.hibernateCache === 'hazelcast' || this.clusteredHttpSession === 'hazelcast' || this.applicationType === 'gateway') {
                 this.template(`${SERVER_MAIN_SRC_DIR}package/config/_CacheConfiguration.java`, `${javaDir}config/CacheConfiguration.java`);
             }
             this.template(`${SERVER_MAIN_SRC_DIR}package/config/_Constants.java`, `${javaDir}config/Constants.java`);
@@ -345,9 +361,8 @@ function writeFiles() {
                 this.template(`${SERVER_MAIN_SRC_DIR}package/config/metrics/_CassandraHealthIndicator.java`, `${javaDir}config/metrics/CassandraHealthIndicator.java`);
             }
 
-            if (this.databaseType === 'cassandra' || this.applicationType === 'gateway') {
+            if (this.databaseType === 'cassandra') {
                 this.template(`${SERVER_MAIN_SRC_DIR}package/config/cassandra/_CassandraConfiguration.java`, `${javaDir}config/cassandra/CassandraConfiguration.java`);
-                this.template(`${SERVER_MAIN_SRC_DIR}package/config/cassandra/_CustomZonedDateTimeCodec.java`, `${javaDir}config/cassandra/CustomZonedDateTimeCodec.java`);
                 this.template(`${SERVER_MAIN_SRC_DIR}package/config/cassandra/_package-info.java`, `${javaDir}config/cassandra/package-info.java`);
             }
             if (this.searchEngine === 'elasticsearch') {
@@ -545,6 +560,10 @@ function writeFiles() {
             /* User management java test files */
             const testDir = this.testDir;
 
+            this.copy(`${SERVER_TEST_RES_DIR}mails/_testEmail.html`, `${SERVER_TEST_RES_DIR}mails/testEmail.html`);
+            this.copy(`${SERVER_TEST_RES_DIR}i18n/_messages_en.properties`, `${SERVER_TEST_RES_DIR}i18n/messages_en.properties`);
+
+            this.template(`${SERVER_TEST_SRC_DIR}package/service/_MailServiceIntTest.java`, `${testDir}service/MailServiceIntTest.java`);
             this.template(`${SERVER_TEST_SRC_DIR}package/service/_UserServiceIntTest.java`, `${testDir}service/UserServiceIntTest.java`);
             this.template(`${SERVER_TEST_SRC_DIR}package/web/rest/_LogsResourceIntTest.java`, `${testDir}web/rest/LogsResourceIntTest.java`);
             this.template(`${SERVER_TEST_SRC_DIR}package/web/rest/_ProfileInfoResourceIntTest.java`, `${testDir}web/rest/ProfileInfoResourceIntTest.java`);
@@ -557,7 +576,9 @@ function writeFiles() {
             this.template(`${SERVER_TEST_SRC_DIR}package/web/rest/_AccountResourceIntTest.java`, `${testDir}web/rest/AccountResourceIntTest.java`);
             this.template(`${SERVER_TEST_SRC_DIR}package/security/_SecurityUtilsUnitTest.java`, `${testDir}security/SecurityUtilsUnitTest.java`);
             if (this.authenticationType === 'jwt') {
+                this.template(`${SERVER_TEST_SRC_DIR}package/security/jwt/_JWTFilterTest.java`, `${testDir}security/jwt/JWTFilterTest.java`);
                 this.template(`${SERVER_TEST_SRC_DIR}package/security/jwt/_TokenProviderTest.java`, `${testDir}security/jwt/TokenProviderTest.java`);
+                this.template(`${SERVER_TEST_SRC_DIR}package/web/rest/_UserJWTControllerIntTest.java`, `${testDir}web/rest/UserJWTControllerIntTest.java`);
             }
 
             if (this.databaseType === 'sql' || this.databaseType === 'mongodb') {

@@ -20,7 +20,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { EventManager, JhiLanguageService } from 'ng-jhipster';
+import { EventManager } from 'ng-jhipster';
 
 import { UserModalService } from './user-modal.service';
 import { <% if (enableTranslation) { %>JhiLanguageHelper,<% } %> User, UserService } from '../../shared';
@@ -40,7 +40,6 @@ export class UserMgmtDialogComponent implements OnInit {
         public activeModal: NgbActiveModal,
         <%_ if (enableTranslation) { _%>
         private languageHelper: JhiLanguageHelper,
-        private jhiLanguageService: JhiLanguageService,
         <%_ } _%>
         private userService: UserService,
         private eventManager: EventManager
@@ -48,12 +47,14 @@ export class UserMgmtDialogComponent implements OnInit {
 
     ngOnInit() {
         this.isSaving = false;
-        this.authorities = ['ROLE_USER', 'ROLE_ADMIN'];
+        this.authorities = [];
+        this.userService.authorities().subscribe((authorities) => {
+            this.authorities = authorities;
+        });
         <%_ if (enableTranslation) { _%>
         this.languageHelper.getAll().then((languages) => {
             this.languages = languages;
         });
-        this.jhiLanguageService.setLocations(['user-management']);
         <%_ } _%>
     }
 

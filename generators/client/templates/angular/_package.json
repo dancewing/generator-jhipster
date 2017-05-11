@@ -40,7 +40,7 @@
     "core-js": "2.4.1",
     "font-awesome": "4.7.0",
     "jquery": "3.2.1",
-    "ng-jhipster": "0.1.12",
+    "ng-jhipster": "0.1.14",
     "ng2-webstorage": "1.6.2",
     "reflect-metadata": "0.1.10",
     "rxjs": "5.3.0",
@@ -115,6 +115,9 @@
     "webpack-merge": "4.1.0",
     "webpack-notifier": "1.5.0",
     "webpack-visualizer-plugin": "0.1.11",
+    <%_ if (enableTranslation) { _%>
+    "merge-jsons-webpack-plugin": "1.0.5",
+    <%_ } _%>
     "write-file-webpack-plugin": "3.4.2",
     <%_ if (buildTool == 'maven') { _%>
     "xml2js": "0.4.17",
@@ -144,7 +147,8 @@
     "webpack:build:dev": "webpack --config webpack/webpack.dev.js",
     "webpack:build:vendor": "webpack --config webpack/webpack.vendor.js",
     "webpack:dev": "webpack-dev-server --config webpack/webpack.dev.js  --progress --inline --hot --profile --port=9060",
-    "webpack:prod": "<%= clientPackageManager %> run ngc && <%= clientPackageManager %> run test && webpack -p --config webpack/webpack.vendor.js && webpack -p --config webpack/webpack.prod.js",
+    "webpack:test": "<%= clientPackageManager %> run ngc && <%= clientPackageManager %> run test",
+    "webpack:prod": "<%= clientPackageManager %> run ngc && webpack -p --config webpack/webpack.vendor.js && webpack -p --config webpack/webpack.prod.js",
     "test": "<%= clientPackageManager %> run lint && karma start src/test/javascript/karma.conf.js",
     "test:watch": "karma start --watch",
     <%_ if (protractorTests) { _%>

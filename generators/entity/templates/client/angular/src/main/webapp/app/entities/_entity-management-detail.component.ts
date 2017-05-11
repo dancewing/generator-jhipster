@@ -27,7 +27,7 @@ _%>
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs/Rx';
-import { EventManager <% if (enableTranslation) { %>, JhiLanguageService<% } %> <% if (fieldsContainBlob) { %>, DataUtils<% } %> } from 'ng-jhipster';
+import { EventManager <% if (fieldsContainBlob) { %>, DataUtils<% } %> } from 'ng-jhipster';
 
 import { <%= entityAngularName %> } from './<%= entityFileName %>.model';
 import { <%= entityAngularName %>Service } from './<%= entityFileName %>.service';
@@ -39,23 +39,17 @@ import { <%= entityAngularName %>Service } from './<%= entityFileName %>.service
 export class <%= entityAngularName %>DetailComponent implements OnInit, OnDestroy {
 
     <%= entityInstance %>: <%= entityAngularName %>;
-    private subscription: any;
+    private subscription: Subscription;
     private eventSubscriber: Subscription;
 
     constructor(
         private eventManager: EventManager,
-        <%_ if (enableTranslation) { _%>
-        private jhiLanguageService: JhiLanguageService,
-        <%_ } _%>
         <%_ if (fieldsContainBlob) { _%>
         private dataUtils: DataUtils,
         <%_ } _%>
         private <%= entityInstance %>Service: <%= entityAngularName %>Service,
         private route: ActivatedRoute
     ) {
-        <%_ if (enableTranslation) { _%>
-        this.jhiLanguageService.setLocations(<%- toArrayString(i18nToLoad) %>);
-        <%_ } _%>
     }
 
     ngOnInit() {

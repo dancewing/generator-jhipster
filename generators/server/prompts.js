@@ -1,3 +1,22 @@
+/**
+ * Copyright 2013-2017 the original author or authors.
+ *
+ * This file is part of the JHipster project, see https://jhipster.github.io/
+ * for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 const path = require('path');
 const shelljs = require('shelljs');
 const crypto = require('crypto');
@@ -46,18 +65,62 @@ function askForServerSideOpts() {
             store: true
         },
         {
+            when: response => applicationType === 'gateway' || applicationType === 'microservice' || applicationType === 'uaa',
+            type: 'list',
+            name: 'serviceDiscoveryType',
+            message: response => this.getNumberedQuestion(
+                'Do you want to use the JHipster Registry to configure, monitor and scale your microservices and gateways?',
+                applicationType === 'gateway' || applicationType === 'microservice' || applicationType === 'uaa'
+            ),
+            choices: [
+                {
+                    value: 'eureka',
+                    name: 'Yes'
+                },
+                {
+                    value: 'consul',
+                    name: '[BETA] No, use Consul as an alternative solution (uses Spring Cloud Consul)'
+                },
+                {
+                    value: false,
+                    name: 'No'
+                }
+            ],
+            default: 'eureka'
+        },
+        {
             when: response => applicationType === 'monolith',
+            type: 'list',
+            name: 'serviceDiscoveryType',
+            message: response => this.getNumberedQuestion(
+                'Do you want to use the JHipster Registry to configure, monitor and scale your application?',
+                applicationType === 'monolith'
+            ),
+            choices: [
+                {
+                    value: 'eureka',
+                    name: 'Yes'
+                },
+                {
+                    value: false,
+                    name: 'No'
+                }
+            ],
+            default: 'eureka'
+        },
+        {
+            when: response => applicationType === 'monolith' && response.serviceDiscoveryType !== 'eureka',
             type: 'list',
             name: 'authenticationType',
             message: response => this.getNumberedQuestion('Which *type* of authentication would you like to use?', applicationType === 'monolith'),
             choices: [
                 {
-                    value: 'session',
-                    name: 'HTTP Session Authentication (stateful, default Spring Security mechanism)'
-                },
-                {
                     value: 'jwt',
                     name: 'JWT authentication (stateless, with a token)'
+                },
+                {
+                    value: 'session',
+                    name: 'HTTP Session Authentication (stateful, default Spring Security mechanism)'
                 },
                 {
                     value: 'oauth2',
@@ -103,30 +166,6 @@ function askForServerSideOpts() {
                 }
                 return `Could not find a valid JHipster UAA server in path "${input}"`;
             }
-        },
-        {
-            when: response => applicationType === 'gateway' || applicationType === 'microservice' || applicationType === 'uaa',
-            type: 'list',
-            name: 'serviceDiscoveryType',
-            message: response => this.getNumberedQuestion(
-                'Which Service Discovery and Configuration solution would you like to use?',
-                applicationType === 'gateway' || applicationType === 'microservice' || applicationType === 'uaa'
-            ),
-            choices: [
-                {
-                    value: 'eureka',
-                    name: 'JHipster Registry (using Eureka and Spring Cloud Config)'
-                },
-                {
-                    value: 'consul',
-                    name: '[BETA] Consul (using Spring Cloud Consul)'
-                },
-                {
-                    value: false,
-                    name: 'No Service Discovery and Configuration'
-                }
-            ],
-            default: 'eureka'
         },
         {
             when: response => applicationType === 'microservice' || (response.authenticationType === 'uaa' && applicationType === 'gateway'),
@@ -345,7 +384,7 @@ function askForServerSideOpts() {
             default: 0
         },
         {
-            when: response => response.databaseType === 'sql',
+            when: response => (response.databaseType === 'sql' && applicationType !== 'gateway'),
             type: 'list',
             name: 'primaryKeyType',
             message: response => this.getNumberedQuestion(
@@ -375,19 +414,19 @@ function askForServerSideOpts() {
             message: response => this.getNumberedQuestion('Do you want to use Hibernate 2nd level cache?', response.databaseType === 'sql'),
             choices: [
                 {
-                    value: 'no',
-                    name: 'No'
-                },
-                {
                     value: 'ehcache',
                     name: 'Yes, with ehcache (local cache, for a single node)'
                 },
                 {
                     value: 'hazelcast',
                     name: 'Yes, with HazelCast (distributed cache, for multiple nodes)'
+                },
+                {
+                    value: 'no',
+                    name: 'No'
                 }
             ],
-            default: (applicationType === 'gateway' || applicationType === 'microservice' || applicationType === 'uaa') ? 2 : 1
+            default: (applicationType === 'microservice' || applicationType === 'uaa') ? 1 : 0
         },
         {
             type: 'list',
@@ -408,7 +447,14 @@ function askForServerSideOpts() {
     ];
 
     this.prompt(prompts).then((props) => {
+        this.serviceDiscoveryType = props.serviceDiscoveryType;
         this.authenticationType = props.authenticationType;
+
+        // JWT authentication is mandatory with Eureka, so the JHipster Registry
+        // can control the applications
+        if (this.serviceDiscoveryType === 'eureka' && this.authenticationType !== 'uaa') {
+            this.authenticationType = 'jwt';
+        }
 
         if (this.authenticationType === 'session') {
             this.rememberMeKey = crypto.randomBytes(20).toString('hex');
@@ -438,7 +484,6 @@ function askForServerSideOpts() {
         this.devDatabaseType = props.devDatabaseType;
         this.prodDatabaseType = props.prodDatabaseType;
         this.searchEngine = props.searchEngine;
-        this.serviceDiscoveryType = props.serviceDiscoveryType;
         this.buildTool = props.buildTool;
         this.uaaBaseName = getUaaAppName.call(this, props.uaaBaseName).baseName;
 
@@ -455,7 +500,10 @@ function askForServerSideOpts() {
             this.prodDatabaseType = 'cassandra';
             this.hibernateCache = 'no';
         }
-
+        // Hazelcast is mandatory for Gateways, as it is used for rate limiting
+        if (this.applicationType === 'gateway') {
+            this.hibernateCache = 'hazelcast';
+        }
         done();
     });
 }
@@ -491,23 +539,6 @@ function askForOptionalItems() {
                 value: 'clusteredHttpSession:hazelcast'
             }
         );
-    }
-    if (applicationType === 'monolith' && this.authenticationType === 'jwt') {
-        if (this.hibernateCache === 'hazelcast') {
-            choices.push(
-                {
-                    name: 'Service Discovery and Configuration using JHipster Registry (important for scaling Hazelcast)',
-                    value: 'serviceDiscoveryType:eureka'
-                }
-            );
-        } else {
-            choices.push(
-                {
-                    name: 'Service Discovery and Configuration using JHipster Registry',
-                    value: 'serviceDiscoveryType:eureka'
-                }
-            );
-        }
     }
     if (applicationType === 'monolith' || applicationType === 'gateway') {
         choices.push(
