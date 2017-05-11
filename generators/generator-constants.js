@@ -42,6 +42,9 @@ const SUPPORTED_VALIDATION_RULES = ['required', 'max', 'min', 'maxlength', 'minl
 const JHIPSTER_DOCUMENTATION_URL = 'https://jhipster.github.io';
 const JHIPSTER_DOCUMENTATION_ARCHIVE_PATH = '/documentation-archive/';
 
+const GENERATOR_NAME = "genernate-jhipster-kuwago";
+const YO_GENERATOR_NAME = "jhipster-kuwago"
+
 const constants = {
     QUESTIONS: 15, // maximum possible number of questions
     CLIENT_QUESTIONS: 4,

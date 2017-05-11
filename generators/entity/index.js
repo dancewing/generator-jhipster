@@ -76,7 +76,13 @@ module.exports = EntityGenerator.extend({
 
         this.regenerate = this.options.regenerate;
         this.fluentMethods = this.options['fluent-methods'];
-        this.entityTableName = this.getTableName(this.options['table-name'] || this.name);
+        if (this.options['table-name']) {
+            this.entityTableName = this.getTableName(this.options['table-name']);
+        } else if (this.entityTablePrefix !== undefined) {
+            this.entityTableName = this.getTableName((this.entityTablePrefix + "_" + this.name).toLowerCase());
+        } else {
+            this.entityTableName = this.getTableName(this.name);
+        }
         this.entityNameCapitalized = _.upperFirst(this.name);
         this.entityAngularJSSuffix = this.options['angular-suffix'];
         this.isDebugEnabled = this.options.debug;
@@ -183,6 +189,7 @@ module.exports = EntityGenerator.extend({
                 this.validation = false;
                 this.dto = 'no';
                 this.service = 'no';
+                this.auditClassName = 'no';
             } else {
                 // existing entity reading values from file
                 this.log(`\nThe entity ${this.name} is being updated.\n`);
@@ -225,10 +232,24 @@ module.exports = EntityGenerator.extend({
         this.searchEngine = this.fileData.searchEngine || this.searchEngine;
         this.javadoc = this.fileData.javadoc;
         this.entityTableName = this.fileData.entityTableName;
+        this.entityTablePrefix =  this.fileData.tablePrefix;
+
         if (_.isUndefined(this.entityTableName)) {
-            this.warning(`entityTableName is missing in .jhipster/${this.name}.json, using entity name as fallback`);
-            this.entityTableName = this.getTableName(this.name);
+            if (!_.isUndefined(this.entityTablePrefix)) {
+              this.entityTableName = this.getTableName(this.entityTablePrefix + '_' +this.name);
+            } else {
+              this.warning(`entityTableName is missing in .jhipster/${this.name}.json, using entity name as fallback`);
+              this.entityTableName = this.getTableName(this.name);
+            }
+        } else {
+            if (!_.isUndefined(this.entityTablePrefix) && this.entityTableName.indexOf(this.entityTablePrefix + '_') < 0) {
+              this.entityTableName = this.getTableName(this.entityTablePrefix + '_' +this.name);
+            } else {
+              this.warning(`entityTableName is missing in .jhipster/${this.name}.json, using entity name as fallback`);
+              this.entityTableName = this.getTableName(this.name);
+            }
         }
+
         if (jhiCore.isReservedTableName(this.entityTableName, this.prodDatabaseType)) {
             const entityTableName = this.entityTableName;
             this.entityTableName = `jhi_${entityTableName}`;
@@ -243,6 +264,14 @@ module.exports = EntityGenerator.extend({
         if (this.fileData.angularJSSuffix !== undefined) {
             this.entityAngularJSSuffix = this.fileData.angularJSSuffix;
         }
+        if (this.fileData.tablePrefix !== undefined) {
+            this.entityTablePrefix = this.fileData.angularJSSuffix;
+        }
+
+        if (this.fileData.audit !== undefined ) {
+            this.auditClassName = this.fileData.audit;
+        }
+
         this.useMicroserviceJson = this.useMicroserviceJson || !_.isUndefined(this.fileData.microserviceName);
         if (this.applicationType === 'gateway' && this.useMicroserviceJson) {
             this.microserviceName = this.fileData.microserviceName;
@@ -396,6 +425,9 @@ module.exports = EntityGenerator.extend({
             this.data.dto = this.dto;
             this.data.service = this.service;
             this.data.entityTableName = this.entityTableName;
+            this.data.entityTablePrefix = this.entityTablePrefix;
+            this.data.audit = this.auditClassName;
+
             if (this.databaseType === 'sql' || this.databaseType === 'mongodb') {
                 this.data.pagination = this.pagination;
             } else {
@@ -436,6 +468,7 @@ module.exports = EntityGenerator.extend({
             this.entityUrl = this.entityStateName;
             this.entityTranslationKey = this.entityInstance;
             this.entityTranslationKeyMenu = _.camelCase(this.entityStateName);
+            this.entityParentClassName = this.auditClassName ? this.auditClassName : 'no';
 
             this.fieldsContainZonedDateTime = false;
             this.fieldsContainLocalDate = false;
@@ -453,6 +486,7 @@ module.exports = EntityGenerator.extend({
             }
             this.differentRelationships = [];
 
+            this.dtoFields = [];
             // Load in-memory data for fields
             this.fields.forEach((field) => {
                 // Migration from JodaTime to Java Time
@@ -530,7 +564,62 @@ module.exports = EntityGenerator.extend({
                 if (field.fieldValidate) {
                     this.validation = true;
                 }
+
+                this.dtoFields.push(field);
             });
+
+            if (this.auditClassName === 'AbstractAuditingEntity') {
+                this.fieldsContainZonedDateTime = true;
+                this.dtoFields.push({
+                    fieldName: 'createdBy',
+                    fieldType: 'String',
+                    fieldIsEnum: false,
+                    fieldNameCapitalized: 'CreatedBy',
+                    fieldNameUnderscored: 'created_by',
+                    fieldNameAsDatabaseColumn: 'created_by',
+                    fieldNameHumanized: 'Created By',
+                    fieldInJavaBeanMethod: 'CreatedBy',
+                    fieldValidateRulesPatternJava: undefined,
+                    fieldValidate: false
+                });
+                this.dtoFields.push({
+                    fieldName: 'createdDate',
+                    fieldType: 'ZonedDateTime',
+                    fieldIsEnum: false,
+                    fieldNameCapitalized: 'CreatedDate',
+                    fieldNameUnderscored: 'created_date',
+                    fieldNameAsDatabaseColumn: 'created_date',
+                    fieldNameHumanized: 'Created Date',
+                    fieldInJavaBeanMethod: 'CreatedDate',
+                    fieldValidateRulesPatternJava: undefined,
+                    fieldValidate: false
+                });
+                this.dtoFields.push({
+                    fieldName: 'lastModifiedBy',
+                    fieldType: 'String',
+                    fieldIsEnum: false,
+                    fieldNameCapitalized: 'LastModifiedBy',
+                    fieldNameUnderscored: 'last_modified_by',
+                    fieldNameAsDatabaseColumn: 'last_modified_by',
+                    fieldNameHumanized: 'Last Modifie dBy',
+                    fieldInJavaBeanMethod: 'LastModifiedBy',
+                    fieldValidateRulesPatternJava: undefined,
+                    fieldValidate: false
+                });
+                this.dtoFields.push({
+                    fieldName: 'lastModifiedDate',
+                    fieldType: 'ZonedDateTime',
+                    fieldIsEnum: false,
+                    fieldNameCapitalized: 'LastModifiedDate',
+                    fieldNameUnderscored: 'last_modified_date',
+                    fieldNameAsDatabaseColumn: 'last_modified_date',
+                    fieldNameHumanized: 'Last Modified Date',
+                    fieldInJavaBeanMethod: 'LastModifiedDate',
+                    fieldValidateRulesPatternJava: undefined,
+                    fieldValidate: false
+                });
+            }
+
             // Load in-memory data for relationships
             this.relationships.forEach((relationship) => {
                 if (_.isUndefined(relationship.relationshipNameCapitalized)) {

@@ -55,7 +55,12 @@ for (idx in relationships) {
     @Mapping(source = "<%= relationshipName %>Id", target = "<%= relationshipName %>")<% } else if (relationshipType == 'many-to-many' && ownerSide == false) {renMapAnotDto = true; %>
     @Mapping(target = "<%= relationshipNamePlural %>", ignore = true)<% } else if (relationshipType == 'one-to-many') {renMapAnotDto = true; %>
     @Mapping(target = "<%= relationshipNamePlural %>", ignore = true)<% } else if (relationshipType == 'one-to-one' && ownerSide == false) {renMapAnotDto = true; %>
-    @Mapping(target = "<%= relationshipName %>", ignore = true)<% } } %>
+    @Mapping(target = "<%= relationshipName %>", ignore = true)<% } } %><% if (entityParentClassName == 'AbstractAuditingEntity') { %>
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "createdDate", ignore = true)
+    @Mapping(target = "lastModifiedBy", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)  
+    <% } %>
     <% if(renMapAnotDto == true) { %><%= entityClass %> toEntity(<%= entityClass%>DTO <%= entityInstance %>DTO); <% } %>
     /**
      * generating the fromId for all mappers if the databaseType is sql, as the class has relationship to it might need it, instead of

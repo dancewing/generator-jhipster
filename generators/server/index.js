@@ -338,7 +338,11 @@ module.exports = JhipsterServerGenerator.extend({
             if (this.databaseType === 'cassandra' || this.databaseType === 'mongodb') {
                 this.pkType = 'String';
             } else {
-                this.pkType = 'Long';
+                if (this.primaryKeyType === 'UUID') {
+                  this.pkType = 'String';
+                } else {
+                  this.pkType = 'Long';
+                }
             }
 
             this.packageFolder = this.packageName.replace(/\./g, '/');

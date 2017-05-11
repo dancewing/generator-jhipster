@@ -30,8 +30,8 @@ import java.util.Set;<% } %>
 import java.util.Objects;<% if (databaseType == 'cassandra') { %>
 import java.util.UUID;<% } %><% if (fieldsContainBlob && databaseType === 'sql') { %>
 import javax.persistence.Lob;<% } %>
-<%_ for (idx in fields) { if (fields[idx].fieldIsEnum == true) { _%>
-import <%=packageName%>.domain.enumeration.<%= fields[idx].fieldType %>;
+<%_ for (idx in dtoFields) { if (dtoFields[idx].fieldIsEnum == true) { _%>
+import <%=packageName%>.domain.enumeration.<%= dtoFields[idx].fieldType %>;
 <%_ } } _%>
 
 /**
@@ -47,19 +47,19 @@ public class <%= entityClass %>DTO implements Serializable {
     <% } %><% if (databaseType == 'mongodb') { %>
     private String id;<% } %><% if (databaseType == 'cassandra') { %>
     private UUID id;<% } %>
-    <%_ for (idx in fields) {
-        const fieldValidate = fields[idx].fieldValidate;
-        const fieldValidateRules = fields[idx].fieldValidateRules;
-        const fieldValidateRulesMinlength = fields[idx].fieldValidateRulesMinlength;
-        const fieldValidateRulesMaxlength = fields[idx].fieldValidateRulesMaxlength;
-        const fieldValidateRulesMinbytes = fields[idx].fieldValidateRulesMinbytes;
-        const fieldValidateRulesMaxbytes = fields[idx].fieldValidateRulesMaxbytes;
-        const fieldValidateRulesMin = fields[idx].fieldValidateRulesMin;
-        const fieldValidateRulesMax = fields[idx].fieldValidateRulesMax;
-        const fieldValidateRulesPatternJava = fields[idx].fieldValidateRulesPatternJava;
-        const fieldType = fields[idx].fieldType;
-        const fieldTypeBlobContent = fields[idx].fieldTypeBlobContent;
-        const fieldName = fields[idx].fieldName;_%>
+    <%_ for (idx in dtoFields) {
+        const fieldValidate = dtoFields[idx].fieldValidate;
+        const fieldValidateRules = dtoFields[idx].fieldValidateRules;
+        const fieldValidateRulesMinlength = dtoFields[idx].fieldValidateRulesMinlength;
+        const fieldValidateRulesMaxlength = dtoFields[idx].fieldValidateRulesMaxlength;
+        const fieldValidateRulesMinbytes = dtoFields[idx].fieldValidateRulesMinbytes;
+        const fieldValidateRulesMaxbytes = dtoFields[idx].fieldValidateRulesMaxbytes;
+        const fieldValidateRulesMin = dtoFields[idx].fieldValidateRulesMin;
+        const fieldValidateRulesMax = dtoFields[idx].fieldValidateRulesMax;
+        const fieldValidateRulesPatternJava = dtoFields[idx].fieldValidateRulesPatternJava;
+        const fieldType = dtoFields[idx].fieldType;
+        const fieldTypeBlobContent = dtoFields[idx].fieldTypeBlobContent;
+        const fieldName = dtoFields[idx].fieldName;_%>
 
     <%_ if (fieldValidate == true) {
             let required = false;
@@ -106,11 +106,11 @@ public class <%= entityClass %>DTO implements Serializable {
     public void setId(<% if (databaseType == 'sql') { %><%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%><% } %><% if (databaseType == 'mongodb') { %>String<% } %><% if (databaseType == 'cassandra') { %>UUID<% } %> id) {
         this.id = id;
     }
-    <%_ for (idx in fields) {
-        const fieldType = fields[idx].fieldType;
-        const fieldTypeBlobContent = fields[idx].fieldTypeBlobContent;
-        const fieldInJavaBeanMethod = fields[idx].fieldInJavaBeanMethod;
-        const fieldName = fields[idx].fieldName; _%>
+    <%_ for (idx in dtoFields) {
+        const fieldType = dtoFields[idx].fieldType;
+        const fieldTypeBlobContent = dtoFields[idx].fieldTypeBlobContent;
+        const fieldInJavaBeanMethod = dtoFields[idx].fieldInJavaBeanMethod;
+        const fieldName = dtoFields[idx].fieldName; _%>
     <%_ if(fieldTypeBlobContent != 'text') { _%>
     public <%= fieldType %> get<%= fieldInJavaBeanMethod %>() {
     <%_ } else { _%>
@@ -210,8 +210,8 @@ public class <%= entityClass %>DTO implements Serializable {
     @Override
     public String toString() {
         return "<%= entityClass %>DTO{" +
-            "id=" + id +<% for (idx in fields) {
-                const fieldName = fields[idx].fieldName; %>
+            "id=" + id +<% for (idx in dtoFields) {
+                const fieldName = dtoFields[idx].fieldName; %>
             ", <%= fieldName %>='" + <%= fieldName %> + "'" +<% } %>
             '}';
     }

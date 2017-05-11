@@ -232,7 +232,6 @@ public class UserResourceIntTest <% if (databaseType === 'cassandra') { %>extend
     <%_ } _%>
     public void createUserWithExistingId() throws Exception {
         int databaseSizeBeforeCreate = userRepository.findAll().size();
-
         Set<String> authorities = new HashSet<>();
         authorities.add("ROLE_USER");
         ManagedUserVM managedUserVM = new ManagedUserVM(
@@ -240,8 +239,10 @@ public class UserResourceIntTest <% if (databaseType === 'cassandra') { %>extend
             UUID.randomUUID().toString(),
             <%_ } else if (databaseType === 'mongodb') { _%>
             "1L",
-            <%_ } else { _%>
+            <%_ } else if (databaseType === 'sql' && pkType === 'Long') { _%>
             1L,
+            <%_ } else { _%>
+            java.util.UUID.randomUUID().toString(),
             <%_ } _%>
             DEFAULT_LOGIN,
             DEFAULT_PASSWORD,
