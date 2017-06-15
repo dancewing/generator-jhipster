@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2017 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://jhipster.github.io/
  * for more information.
@@ -46,6 +46,7 @@ module.exports = JDLGenerator.extend({
         },
 
         getConfig() {
+            this.applicationType = this.config.get('applicationType');
             this.baseName = this.config.get('baseName');
             this.prodDatabaseType = this.config.get('prodDatabaseType');
             this.skipClient = this.config.get('skipClient');
@@ -73,10 +74,11 @@ module.exports = JDLGenerator.extend({
         parseJDL() {
             this.log('The jdl is being parsed.');
             try {
-                const jdlObject = jhiCore.convertToJDL(jhiCore.parseFromFiles(this.jdlFiles), this.prodDatabaseType);
+                const jdlObject = jhiCore.convertToJDL(jhiCore.parseFromFiles(this.jdlFiles), this.prodDatabaseType, this.applicationType);
                 const entities = jhiCore.convertToJHipsterJSON({
                     jdlObject,
-                    databaseType: this.prodDatabaseType
+                    databaseType: this.prodDatabaseType,
+                    applicationType: this.applicationType
                 });
                 this.log('Writing entity JSON files.');
                 jhiCore.exportToJSON(entities, this.options.force);

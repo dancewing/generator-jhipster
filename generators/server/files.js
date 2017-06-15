@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2017 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://jhipster.github.io/
  * for more information.
@@ -70,7 +70,7 @@ function writeFiles() {
             if (this.prodDatabaseType === 'mongodb') {
                 this.template(`${DOCKER_DIR}_mongodb.yml`, `${DOCKER_DIR}mongodb.yml`);
                 this.template(`${DOCKER_DIR}_mongodb-cluster.yml`, `${DOCKER_DIR}mongodb-cluster.yml`);
-                this.copy(`${DOCKER_DIR}mongodb/MongoDB.Dockerfile`, `${DOCKER_DIR}mongodb/MongoDB.Dockerfile`);
+                this.template(`${DOCKER_DIR}mongodb/MongoDB.Dockerfile`, `${DOCKER_DIR}mongodb/MongoDB.Dockerfile`);
                 this.template(`${DOCKER_DIR}mongodb/scripts/init_replicaset.js`, `${DOCKER_DIR}mongodb/scripts/init_replicaset.js`);
             }
             if (this.prodDatabaseType === 'mssql') {
@@ -79,7 +79,7 @@ function writeFiles() {
             if (this.prodDatabaseType === 'oracle') {
                 this.template(`${DOCKER_DIR}_oracle.yml`, `${DOCKER_DIR}oracle.yml`);
             }
-            if (this.applicationType === 'gateway' || this.prodDatabaseType === 'cassandra') {
+            if (this.prodDatabaseType === 'cassandra') {
                 // docker-compose files
                 this.template(`${DOCKER_DIR}_cassandra.yml`, `${DOCKER_DIR}cassandra.yml`);
                 this.template(`${DOCKER_DIR}_cassandra-cluster.yml`, `${DOCKER_DIR}cassandra-cluster.yml`);
@@ -183,7 +183,7 @@ function writeFiles() {
                 }
             }
 
-            if (this.databaseType === 'cassandra' || this.applicationType === 'gateway') {
+            if (this.databaseType === 'cassandra') {
                 this.template(`${SERVER_MAIN_RES_DIR}config/cql/_create-keyspace-prod.cql`, `${SERVER_MAIN_RES_DIR}config/cql/create-keyspace-prod.cql`);
                 this.template(`${SERVER_MAIN_RES_DIR}config/cql/_create-keyspace.cql`, `${SERVER_MAIN_RES_DIR}config/cql/create-keyspace.cql`);
                 this.template(`${SERVER_MAIN_RES_DIR}config/cql/_drop-keyspace.cql`, `${SERVER_MAIN_RES_DIR}config/cql/drop-keyspace.cql`);
@@ -345,6 +345,7 @@ function writeFiles() {
             }
 
             this.template(`${SERVER_MAIN_SRC_DIR}package/config/_ApplicationProperties.java`, `${javaDir}config/ApplicationProperties.java`);
+            this.template(`${SERVER_MAIN_SRC_DIR}package/config/_JacksonConfiguration.java`, `${javaDir}config/JacksonConfiguration.java`);
             this.template(`${SERVER_MAIN_SRC_DIR}package/config/_LocaleConfiguration.java`, `${javaDir}config/LocaleConfiguration.java`);
             this.template(`${SERVER_MAIN_SRC_DIR}package/config/_LoggingAspectConfiguration.java`, `${javaDir}config/LoggingAspectConfiguration.java`);
             this.template(`${SERVER_MAIN_SRC_DIR}package/config/_MetricsConfiguration.java`, `${javaDir}config/MetricsConfiguration.java`);
@@ -382,7 +383,7 @@ function writeFiles() {
             }
         },
 
-        writeServerJaconstepoFiles() {
+        writeServerJavaPackageInfoFiles() {
             if (this.searchEngine === 'elasticsearch') {
                 this.template(`${SERVER_MAIN_SRC_DIR}package/repository/search/_package-info.java`, `${javaDir}repository/search/package-info.java`);
             }
@@ -442,7 +443,13 @@ function writeFiles() {
                 this.template(`${SERVER_TEST_RES_DIR}_cassandra-random-port.yml`, `${SERVER_TEST_RES_DIR}cassandra-random-port.yml`);
             }
 
+            this.template(`${SERVER_TEST_SRC_DIR}package/config/_WebConfigurerTest.java`, `${testDir}config/WebConfigurerTest.java`);
+            this.template(`${SERVER_TEST_SRC_DIR}package/config/_WebConfigurerTestController.java`, `${testDir}config/WebConfigurerTestController.java`);
             this.template(`${SERVER_TEST_SRC_DIR}package/web/rest/_TestUtil.java`, `${testDir}web/rest/TestUtil.java`);
+            this.template(`${SERVER_TEST_SRC_DIR}package/web/rest/_LogsResourceIntTest.java`, `${testDir}web/rest/LogsResourceIntTest.java`);
+            this.template(`${SERVER_TEST_SRC_DIR}package/web/rest/_ProfileInfoResourceIntTest.java`, `${testDir}web/rest/ProfileInfoResourceIntTest.java`);
+            this.template(`${SERVER_TEST_SRC_DIR}package/web/rest/errors/_ExceptionTranslatorIntTest.java`, `${testDir}web/rest/errors/ExceptionTranslatorIntTest.java`);
+            this.template(`${SERVER_TEST_SRC_DIR}package/web/rest/errors/_ExceptionTranslatorTestController.java`, `${testDir}web/rest/errors/ExceptionTranslatorTestController.java`);
 
             this.template(`${SERVER_TEST_RES_DIR}config/_application.yml`, `${SERVER_TEST_RES_DIR}config/application.yml`);
             this.template(`${SERVER_TEST_RES_DIR}_logback.xml`, `${SERVER_TEST_RES_DIR}logback.xml`);
@@ -565,8 +572,6 @@ function writeFiles() {
 
             this.template(`${SERVER_TEST_SRC_DIR}package/service/_MailServiceIntTest.java`, `${testDir}service/MailServiceIntTest.java`);
             this.template(`${SERVER_TEST_SRC_DIR}package/service/_UserServiceIntTest.java`, `${testDir}service/UserServiceIntTest.java`);
-            this.template(`${SERVER_TEST_SRC_DIR}package/web/rest/_LogsResourceIntTest.java`, `${testDir}web/rest/LogsResourceIntTest.java`);
-            this.template(`${SERVER_TEST_SRC_DIR}package/web/rest/_ProfileInfoResourceIntTest.java`, `${testDir}web/rest/ProfileInfoResourceIntTest.java`);
             this.template(`${SERVER_TEST_SRC_DIR}package/web/rest/_UserResourceIntTest.java`, `${testDir}web/rest/UserResourceIntTest.java`);
             if (this.enableSocialSignIn) {
                 this.template(`${SERVER_TEST_SRC_DIR}package/repository/_CustomSocialUsersConnectionRepositoryIntTest.java`, `${testDir}repository/CustomSocialUsersConnectionRepositoryIntTest.java`);
@@ -582,6 +587,7 @@ function writeFiles() {
             }
 
             if (this.databaseType === 'sql' || this.databaseType === 'mongodb') {
+                this.template(`${SERVER_TEST_SRC_DIR}package/repository/_CustomAuditEventRepositoryIntTest.java`, `${testDir}repository/CustomAuditEventRepositoryIntTest.java`);
                 this.template(`${SERVER_TEST_SRC_DIR}package/web/rest/_AuditResourceIntTest.java`, `${testDir}web/rest/AuditResourceIntTest.java`);
             }
             // Cucumber user management tests

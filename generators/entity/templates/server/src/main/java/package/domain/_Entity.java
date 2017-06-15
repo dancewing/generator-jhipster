@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2017 the original author or authors.
+ Copyright 2013-2017 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://jhipster.github.io/
  for more information.
@@ -186,11 +186,8 @@ public class <%= entityClass %> <% if (entityParentClassName != 'no') { -%>exten
 
     <%_ } else if (relationshipType == 'many-to-many') { _%>
     @ManyToMany<% if (ownerSide == false) { %>(mappedBy = "<%= otherEntityRelationshipNamePlural %>")
-    @JsonIgnore
-    <%_     } else { _%>
-
-    <%_     }
-            if (hibernateCache != 'no') { _%>
+    @JsonIgnore<% } %>
+    <%_     if (hibernateCache != 'no') { _%>
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     <%_     }
             if (ownerSide == true) { _%>

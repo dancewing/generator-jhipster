@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2017 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://jhipster.github.io/
  * for more information.
@@ -198,8 +198,6 @@ module.exports = DockerComposeGenerator.extend({
 
                 // Add monitoring configuration for monolith directly in the docker-compose file as they can't get them from the config server
                 if (appConfig.applicationType === 'monolith' && this.monitoring === 'elk') {
-                    yamlConfig.environment.push('SPRING_ZIPKIN_ENABLED=true');
-                    yamlConfig.environment.push('SPRING_ZIPKIN_BASE_URL=http://jhipster-zipkin:9411');
                     yamlConfig.environment.push('JHIPSTER_LOGGING_LOGSTASH_ENABLED=true');
                     yamlConfig.environment.push('JHIPSTER_LOGGING_LOGSTASH_HOST=jhipster-logstash');
                     yamlConfig.environment.push('JHIPSTER_METRICS_LOGS_ENABLED=true');

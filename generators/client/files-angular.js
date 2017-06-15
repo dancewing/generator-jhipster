@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2017 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://jhipster.github.io/
  * for more information.
@@ -38,6 +38,7 @@ const files = {
                 '_tsconfig-aot.json',
                 '_tslint.json',
                 '_.angular-cli.json',
+                'webpack/_utils.js',
                 'webpack/_webpack.common.js',
                 'webpack/_webpack.dev.js',
                 'webpack/_webpack.prod.js',
@@ -101,7 +102,9 @@ const files = {
                 { file: '_favicon.ico', method: 'copy' },
                 '_robots.txt',
                 '_404.html',
-                '_index.html'
+                '_index.html',
+                '_manifest.webapp',
+                '_sw.js'
             ]
         }
     ],
@@ -366,6 +369,8 @@ const files = {
                 'shared/_shared-common.module.ts',
                 'shared/constants/_pagination.constants.ts',
                 // models
+                'shared/model/_response-wrapper.model.ts',
+                'shared/model/_request-util.ts',
                 'shared/user/_account.model.ts',
                 // login
                 'shared/login/_login.component.ts',
@@ -381,7 +386,7 @@ const files = {
             condition: generator => generator.enableTranslation,
             path: ANGULAR_DIR,
             templates: [
-                'shared/language/_language.pipe.ts',
+                'shared/language/_find-language-from-key.pipe.ts',
                 'shared/language/_language.constants.ts',
                 'shared/language/_language.helper.ts'
             ]

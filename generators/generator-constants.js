@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2017 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://jhipster.github.io/
  * for more information.
@@ -18,9 +18,9 @@
  */
 
 // version of docker images
-const DOCKER_JHIPSTER_REGISTRY = 'jhipster/jhipster-registry:v3.0.0';
+const DOCKER_JHIPSTER_REGISTRY = 'jhipster/jhipster-registry:v3.0.1';
 const DOCKER_JAVA_JRE = 'openjdk:8-jre-alpine';
-const DOCKER_MYSQL = 'mysql:5.7.13'; // mysql.5.7.14+ doesn't work well with zoned date time, see https://github.com/jhipster/generator-jhipster/pull/4038
+const DOCKER_MYSQL = 'mysql:5.7.18';
 const DOCKER_MARIADB = 'mariadb:10.1.17';
 const DOCKER_POSTGRESQL = 'postgres:9.6.2';
 const DOCKER_MONGODB = 'mongo:3.2.10';
@@ -43,8 +43,8 @@ const DOCKER_GRAFANA = 'grafana/grafana:4.0.2';
 const DOCKER_JENKINS = 'jenkins:latest';
 
 // version of Node, Yarn, NPM
-const NODE_VERSION = '6.10.2';
-const YARN_VERSION = '0.23.2';
+const NODE_VERSION = '6.10.3';
+const YARN_VERSION = '0.24.4';
 const NPM_VERSION = '4.5.0';
 
 // all constants used throughout all generators

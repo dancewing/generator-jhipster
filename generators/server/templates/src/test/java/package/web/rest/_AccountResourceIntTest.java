@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2017 the original author or authors.
+ Copyright 2013-2017 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://jhipster.github.io/
  for more information.
@@ -294,6 +294,39 @@ public class AccountResourceIntTest <% if (databaseType == 'cassandra') { %>exte
             null,               // id
             "bob",              // login
             "123",              // password with only 3 digits
+            "Bob",              // firstName
+            "Green",            // lastName
+            "bob@example.com",  // email
+            true,               // activated
+            <%_ if (databaseType == 'mongodb' || databaseType == 'sql') { _%>
+            "http://placehold.it/50x50", //imageUrl
+            <%_ } _%>
+            "<%= nativeLanguage %>",                   // langKey
+            <%_ if (databaseType == 'mongodb' || databaseType == 'sql') { _%>
+            null,                   // createdBy
+            null,                   // createdDate
+            null,                   // lastModifiedBy
+            null,                   // lastModifiedDate
+            <%_ } _%>
+            new HashSet<>(Collections.singletonList(AuthoritiesConstants.USER)));
+
+        restUserMockMvc.perform(
+            post("/api/register")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(invalidUser)))
+            .andExpect(status().isBadRequest());
+
+        Optional<User> user = userRepository.findOneByLogin("bob");
+        assertThat(user.isPresent()).isFalse();
+    }
+
+    @Test<% if (databaseType == 'sql') { %>
+    @Transactional<% } %>
+    public void testRegisterNullPassword() throws Exception {
+        ManagedUserVM invalidUser = new ManagedUserVM(
+            null,               // id
+            "bob",              // login
+            null,               // invalid null password
             "Bob",              // firstName
             "Green",            // lastName
             "bob@example.com",  // email
@@ -643,15 +676,6 @@ public class AccountResourceIntTest <% if (databaseType == 'cassandra') { %>exte
         user.setActivated(true);
 
         userRepository.save<% if (databaseType == 'sql') { %>AndFlush<% } %>(user);
-
-        User anotherUser = new User();
-        <%_ if (databaseType === 'cassandra') { _%>
-        anotherUser.setId(UUID.randomUUID().toString());
-        <%_ } _%>
-        anotherUser.setLogin("save-existing-email-and-login");
-        anotherUser.setEmail("save-existing-email-and-login@example.com");
-        anotherUser.setPassword(RandomStringUtils.random(60));
-        anotherUser.setActivated(true);
 
         UserDTO userDTO = new UserDTO(
             null,                   // id

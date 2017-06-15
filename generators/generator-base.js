@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2017 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://jhipster.github.io/
  * for more information.
@@ -185,7 +185,7 @@ module.exports = class extends Generator {
                     splicable: [
                         this.stripMargin(
                             `|<li>
-                             |                        <a class="dropdown-item" routerLink="${routerName}" routerLinkActive="active" (click)="collapseNavbar()">
+                             |                        <a class="dropdown-item" routerLink="${routerName}" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
                              |                            <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
                              |                            <span${enableTranslation ? ` jhiTranslate="global.menu.entities.${_.camelCase(routerName)}"` : ''}>${_.startCase(routerName)}</span>
                              |                        </a>
@@ -459,6 +459,7 @@ module.exports = class extends Generator {
             { name: 'Turkish', value: 'tr' },
             { name: 'Tamil', value: 'ta' },
             { name: 'Thai', value: 'th' },
+            { name: 'Ukrainian', value: 'ua' },
             { name: 'Vietnamese', value: 'vi' }
         ];
     }
@@ -1138,8 +1139,8 @@ module.exports = class extends Generator {
         switch (action) {
         case 'stripHtml' :
             regex = new RegExp([
-                /( (data-t|jhiT)ranslate="([a-zA-Z0-9 +{}'](\.)?)+")/,                    // data-translate or jhiTranslate
-                /( translate(-v|V)alues="\{([a-zA-Z]|\d|:|\{|\}|\[|\]|-|'|\s|\.)*?\}")/,    // translate-values or translateValues
+                /( (data-t|jhiT)ranslate="([a-zA-Z0-9 +{}'_](\.)?)+")/,                    // data-translate or jhiTranslate
+                /( translate(-v|V)alues="\{([a-zA-Z]|\d|:|\{|\}|\[|\]|-|'|\s|\.|_)*?\}")/,    // translate-values or translateValues
                 /( translate-compile)/,                                                         // translate-compile
                 /( translate-value-max="[0-9{}()|]*")/,                                   // translate-value-max
             ].map(r => r.source).join('|'), 'g');
@@ -1670,7 +1671,7 @@ module.exports = class extends Generator {
                 when: response => response.enableTranslation === true,
                 type: 'list',
                 name: 'nativeLanguage',
-                message: 'Please choose the native language of the application?',
+                message: 'Please choose the native language of the application',
                 choices: languageOptions,
                 default: 'en',
                 store: true
@@ -1919,11 +1920,11 @@ module.exports = class extends Generator {
             let content = 'groupBy: [\n';
             for (let i = 0, len = languages.length; i < len; i++) {
                 const language = languages[i];
-                content += `                        { pattern: "./src/main/webapp/i18n/${language}/*.json", fileName: "./${this.BUILD_DIR}www/i18n/${language}/all.json" }${i !== languages.length - 1 ? ',' : ''}\n`;
+                content += `                        { pattern: "./src/main/webapp/i18n/${language}/*.json", fileName: "./${this.BUILD_DIR}www/i18n/${language}.json" }${i !== languages.length - 1 ? ',' : ''}\n`;
             }
             content +=
                 '                        // jhipster-needle-i18n-language-webpack - JHipster will add/remove languages in this array\n' +
-                '                 ]';
+                '                    ]';
 
             jhipsterUtils.replaceContent({
                 file: fullPath,
@@ -2220,5 +2221,58 @@ module.exports = class extends Generator {
             }
             done();
         });
+    }
+
+    generateEntityQueries(relationships, entityInstance, dto) {
+        const queries = [];
+        const variables = [];
+        let hasManyToMany = false;
+        relationships.forEach((relationship) => {
+            let query;
+            let variableName;
+            hasManyToMany = hasManyToMany || relationship.relationshipType === 'many-to-many';
+            if (relationship.relationshipType === 'one-to-one' && relationship.ownerSide === true && relationship.otherEntityName !== 'user') {
+                variableName = relationship.relationshipFieldNamePlural.toLowerCase();
+                if (variableName === entityInstance) {
+                    variableName += 'Collection';
+                }
+                const relationshipFieldName = `this.${entityInstance}.${relationship.relationshipFieldName}`;
+                const relationshipFieldNameIdCheck = dto === 'no' ?
+                    `!${relationshipFieldName} || !${relationshipFieldName}.id` :
+                    `!${relationshipFieldName}Id`;
+
+                query =
+        `this.${relationship.otherEntityName}Service
+            .query({filter: '${relationship.otherEntityRelationshipName.toLowerCase()}-is-null'})
+            .subscribe((res: ResponseWrapper) => {
+                if (${relationshipFieldNameIdCheck}) {
+                    this.${variableName} = res.json;
+                } else {
+                    this.${relationship.otherEntityName}Service
+                        .find(${relationshipFieldName}${dto === 'no' ? '.id' : 'Id'})
+                        .subscribe((subRes: ${relationship.otherEntityAngularName}) => {
+                            this.${variableName} = [subRes].concat(res.json);
+                        }, (subRes: ResponseWrapper) => this.onError(subRes.json));
+                }
+            }, (res: ResponseWrapper) => this.onError(res.json));`;
+            } else if (relationship.relationshipType !== 'one-to-many') {
+                variableName = relationship.otherEntityNameCapitalizedPlural.toLowerCase();
+                if (variableName === entityInstance) {
+                    variableName += 'Collection';
+                }
+                query =
+        `this.${relationship.otherEntityName}Service.query()
+            .subscribe((res: ResponseWrapper) => { this.${variableName} = res.json; }, (res: ResponseWrapper) => this.onError(res.json));`;
+            }
+            if (variableName && !this.contains(queries, query)) {
+                queries.push(query);
+                variables.push(`${variableName}: ${relationship.otherEntityAngularName}[];`);
+            }
+        });
+        return {
+            queries,
+            variables,
+            hasManyToMany
+        };
     }
 };

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2017 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://jhipster.github.io/
  * for more information.
@@ -98,15 +98,15 @@ function askForServerSideOpts() {
             ),
             choices: [
                 {
-                    value: 'eureka',
-                    name: 'Yes'
-                },
-                {
                     value: false,
                     name: 'No'
+                },
+                {
+                    value: 'eureka',
+                    name: 'Yes'
                 }
             ],
-            default: 'eureka'
+            default: false
         },
         {
             when: response => applicationType === 'monolith' && response.serviceDiscoveryType !== 'eureka',
@@ -154,7 +154,7 @@ function askForServerSideOpts() {
             type: 'input',
             name: 'uaaBaseName',
             message: response => this.getNumberedQuestion(
-                'What is the folder path of your UAA application?.',
+                'What is the folder path of your UAA application?',
                 (applicationType === 'gateway' || applicationType === 'microservice') && response.authenticationType === 'uaa'
             ),
             default: '../uaa',
