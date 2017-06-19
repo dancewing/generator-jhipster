@@ -384,7 +384,7 @@ function askForServerSideOpts() {
             default: 0
         },
         {
-            when: response => (response.databaseType === 'sql' && applicationType !== 'gateway'),
+            when: response => (response.databaseType === 'sql'),
             type: 'list',
             name: 'primaryKeyType',
             message: response => this.getNumberedQuestion(

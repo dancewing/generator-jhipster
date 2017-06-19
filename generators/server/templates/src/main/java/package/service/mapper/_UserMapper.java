@@ -83,7 +83,7 @@ public class UserMapper {
             .map(this::userDTOToUser)
             .collect(Collectors.toList());
     }
-    default User userFromId(<% if (databaseType == 'mongodb' || databaseType == 'cassandra' || primaryKeyType == 'UUID') { %>String<% } else { %>Long<% } %> id) {
+    public User userFromId(<% if (databaseType == 'mongodb' || databaseType == 'cassandra' || primaryKeyType == 'UUID') { %>String<% } else { %>Long<% } %> id) {
         if (id == null) {
             return null;
         }
