@@ -1,6 +1,0 @@
-user_id;authority_name
-<%=userId_1%>;ROLE_ADMIN
-<%=userId_1%>;ROLE_USER
-<%=userId_3%>;ROLE_ADMIN
-<%=userId_3%>;ROLE_USER
-<%=userId_4%>;ROLE_USER
