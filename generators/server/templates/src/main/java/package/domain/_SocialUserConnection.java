@@ -18,25 +18,25 @@
 -%>
 package <%=packageName%>.domain;
 
-<%_ if (databaseType == 'mongodb') { _%>
+<%_ if (databaseType === 'mongodb') { _%>
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 <%_ } _%>
-<%_ if (hibernateCache != 'no') { _%>
+<%_ if (hibernateCache !== 'no') { _%>
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 <%_ } _%>
-<%_ if (databaseType == 'sql') { _%>
+<%_ if (databaseType === 'sql') { _%>
 import javax.persistence.*;
 <%_ if (primaryKeyType == 'UUID') { _%>
 import org.hibernate.annotations.GenericGenerator;
 <%_ } _%>
 <%_ } _%>
 import javax.validation.constraints.NotNull;
-<%_ if (databaseType == 'mongodb') { _%>
+<%_ if (databaseType === 'mongodb') { _%>
 import javax.validation.constraints.Size;
 <%_ } _%>
 import java.io.Serializable;
@@ -44,10 +44,10 @@ import java.util.Objects;
 
 /**
  * A Social user.
- */<% if (databaseType == 'sql') { %>
+ */<% if (databaseType === 'sql') { %>
 @Entity
-@Table(name = "jhi_social_user_connection")<% if (hibernateCache != 'no') { %>
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)<% } %><% } %><% if (databaseType == 'mongodb') { %>
+@Table(name = "jhi_social_user_connection")<% if (hibernateCache !== 'no') { %>
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)<% } %><% } %><% if (databaseType === 'mongodb') { %>
 @Document(collection = "jhi_social_user_connection")
 @CompoundIndexes(
     @CompoundIndex(name = "user2-prov-provusr-idx", unique = true, def = "{'user_id': 1, 'provider_id': 1, 'provider_user_id': 1}")
@@ -55,75 +55,77 @@ import java.util.Objects;
 public class SocialUserConnection implements Serializable {
 
     private static final long serialVersionUID = 1L;
-<% if (databaseType == 'sql') { %>
+<% if (databaseType === 'sql') { %>
     @Id
-    <%_ if (primaryKeyType == 'IDENTITY') { _%>
+    <%_ if (primaryKeyType === 'IDENTITY') { _%>
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    <%_ }  else if (primaryKeyType == 'SEQUENCE') { _%>
+    <%_ }  else if (primaryKeyType === 'SEQUENCE') { _%>
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
     @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
-    <%_ } else if (primaryKeyType == 'UUID') { _%>
+    <%_ } else if (primaryKeyType === 'UUID') { _%>
     @GeneratedValue(generator="system-uuid")
     @GenericGenerator(name="system-uuid", strategy = "uuid")
     private String id;<% }} %><% if (databaseType == 'mongodb') { %>
+    <%_ } _%>
+    private Long id;<% } %><% if (databaseType === 'mongodb') { %>
     @Id
     private String id;<% } %>
 
-    @NotNull<% if (databaseType == 'sql') { %>
-    @Column(name = "user_id", length = 255, nullable = false)<% } %><% if (databaseType == 'mongodb') { %>
+    @NotNull<% if (databaseType === 'sql') { %>
+    @Column(name = "user_id", length = 255, nullable = false)<% } %><% if (databaseType === 'mongodb') { %>
     @Size(max = 255)
     @Field("user_id")<% } %>
     private String userId;
 
-    @NotNull<% if (databaseType == 'sql') { %>
-    @Column(name = "provider_id", length = 255, nullable = false)<% } %><% if (databaseType == 'mongodb') { %>
+    @NotNull<% if (databaseType === 'sql') { %>
+    @Column(name = "provider_id", length = 255, nullable = false)<% } %><% if (databaseType === 'mongodb') { %>
     @Size(max = 255)
     @Field("provider_id")<% } %>
     private String providerId;
 
-    @NotNull<% if (databaseType == 'sql') { %>
-    @Column(name = "provider_user_id", length = 255, nullable = false)<% } %><% if (databaseType == 'mongodb') { %>
+    @NotNull<% if (databaseType === 'sql') { %>
+    @Column(name = "provider_user_id", length = 255, nullable = false)<% } %><% if (databaseType === 'mongodb') { %>
     @Size(max = 255)
     @Field("provider_user_id")<% } %>
     private String providerUserId;
 
-    @NotNull<% if (databaseType == 'sql') { %>
+    @NotNull<% if (databaseType === 'sql') { %>
     @Column(nullable = false)<% } %>
     private Long rank;
-<% if (databaseType == 'sql') { %>
-    @Column(name = "display_name", length = 255)<% } %><% if (databaseType == 'mongodb') { %>
+<% if (databaseType === 'sql') { %>
+    @Column(name = "display_name", length = 255)<% } %><% if (databaseType === 'mongodb') { %>
     @Size(max = 255)
     @Field("display_name")<% } %>
     private String displayName;
-<% if (databaseType == 'sql') { %>
-    @Column(name = "profile_url", length = 255)<% } %><% if (databaseType == 'mongodb') { %>
+<% if (databaseType === 'sql') { %>
+    @Column(name = "profile_url", length = 255)<% } %><% if (databaseType === 'mongodb') { %>
     @Size(max = 255)
     @Field("profile_url")<% } %>
     private String profileURL;
-<% if (databaseType == 'sql') { %>
-    @Column(name = "image_url", length = 255)<% } %><% if (databaseType == 'mongodb') { %>
+<% if (databaseType === 'sql') { %>
+    @Column(name = "image_url", length = 255)<% } %><% if (databaseType === 'mongodb') { %>
     @Size(max = 255)
     @Field("image_url")<% } %>
     private String imageURL;
 
-    @NotNull<% if (databaseType == 'sql') { %>
-    @Column(name = "access_token", length = 255, nullable = false)<% } %><% if (databaseType == 'mongodb') { %>
+    @NotNull<% if (databaseType === 'sql') { %>
+    @Column(name = "access_token", length = 255, nullable = false)<% } %><% if (databaseType === 'mongodb') { %>
     @Size(max = 255)
     @Field("access_token")<% } %>
     private String accessToken;
-<% if (databaseType == 'sql') { %>
-    @Column(length = 255)<% } %><% if (databaseType == 'mongodb') { %>
+<% if (databaseType === 'sql') { %>
+    @Column(length = 255)<% } %><% if (databaseType === 'mongodb') { %>
     @Size(max = 255)<% } %>
     private String secret;
-<% if (databaseType == 'sql') { %>
-    @Column(name = "refresh_token", length = 255)<% } %><% if (databaseType == 'mongodb') { %>
+<% if (databaseType === 'sql') { %>
+    @Column(name = "refresh_token", length = 255)<% } %><% if (databaseType === 'mongodb') { %>
     @Size(max = 255)
     @Field("refresh_token")<% } %>
     private String refreshToken;
-<% if (databaseType == 'sql') { %>
-    @Column(name = "expire_time")<% } %><% if (databaseType == 'mongodb') { %>
+<% if (databaseType === 'sql') { %>
+    @Column(name = "expire_time")<% } %><% if (databaseType === 'mongodb') { %>
     @Field("expire_time")<% } %>
     private Long expireTime;
 
@@ -152,11 +154,19 @@ public class SocialUserConnection implements Serializable {
         this.expireTime = expireTime;
     }
 
+<<<<<<< HEAD
     public <% if (databaseType == 'sql') { %><%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%><% } else if (databaseType == 'mongodb') { %>String<% } %> getId() {
         return id;
     }
 
     public void setId(<% if (databaseType == 'sql') { %><%_ if (primaryKeyType == 'UUID') { _%>String<%_ } else { _%>Long<%_ } _%><% } else if (databaseType == 'mongodb') { %>String<% } %> id) {
+=======
+    public <% if (databaseType === 'sql') { %>Long<% } else if (databaseType === 'mongodb') { %>String<% } %> getId() {
+        return id;
+    }
+
+    public void setId(<% if (databaseType === 'sql') { %>Long<% } else if (databaseType === 'mongodb') { %>String<% } %> id) {
+>>>>>>> upstream/master
         this.id = id;
     }
 

@@ -21,33 +21,38 @@ let importApiModelProperty = false;
 let importJsonignore = false;
 let importSet = false;
 const uniqueEnums = {}; %><%- include imports -%>
-<% if (databaseType == 'cassandra') { %>
-import com.datastax.driver.mapping.annotations.*;<% } %><% if (importJsonignore == true) { %>
+<% if (databaseType === 'cassandra') { %>
+import com.datastax.driver.mapping.annotations.*;<% } %><% if (importJsonignore === true) { %>
 import com.fasterxml.jackson.annotation.JsonIgnore;<% } %><% if (typeof javadoc != 'undefined') { %>
-import io.swagger.annotations.ApiModel;<% } %><% if (importApiModelProperty == true) { %>
-import io.swagger.annotations.ApiModelProperty;<% } %><% if (hibernateCache != 'no') { %>
+import io.swagger.annotations.ApiModel;<% } %><% if (importApiModelProperty === true) { %>
+import io.swagger.annotations.ApiModelProperty;<% } %><% if (hibernateCache !== 'no') { %>
 import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;<% } %><% if (databaseType == 'mongodb') { %>
+import org.hibernate.annotations.CacheConcurrencyStrategy;<% } %><% if (databaseType === 'mongodb') { %>
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;<% } %><% if (searchEngine == 'elasticsearch') { %>
+import org.springframework.data.mongodb.core.mapping.Field;<% } %><% if (searchEngine === 'elasticsearch') { %>
 import org.springframework.data.elasticsearch.annotations.Document;<% } %>
+<<<<<<< HEAD
 <% if (databaseType == 'sql') { %>
 import javax.persistence.*;
 <%_ if (primaryKeyType == 'UUID') { _%>
 import org.hibernate.annotations.GenericGenerator;
 <%_ } _%>
 <% } %><% if (validation) { %>
+=======
+<% if (databaseType === 'sql') { %>
+import javax.persistence.*;<% } %><% if (validation) { %>
+>>>>>>> upstream/master
 import javax.validation.constraints.*;<% } %>
-import java.io.Serializable;<% if (fieldsContainBigDecimal == true) { %>
+import java.io.Serializable;<% if (fieldsContainBigDecimal === true) { %>
 import java.math.BigDecimal;<% } %><% if (fieldsContainBlob && databaseType === 'cassandra') { %>
-import java.nio.ByteBuffer;<% } %><% if (fieldsContainInstant == true) { %>
-import java.time.Instant;<% } %><% if (fieldsContainLocalDate == true) { %>
-import java.time.LocalDate;<% } %><% if (fieldsContainZonedDateTime == true) { %>
-import java.time.ZonedDateTime;<% } %><% if (importSet == true) { %>
+import java.nio.ByteBuffer;<% } %><% if (fieldsContainInstant === true) { %>
+import java.time.Instant;<% } %><% if (fieldsContainLocalDate === true) { %>
+import java.time.LocalDate;<% } %><% if (fieldsContainZonedDateTime === true) { %>
+import java.time.ZonedDateTime;<% } %><% if (importSet === true) { %>
 import java.util.HashSet;
 import java.util.Set;<% } %>
-import java.util.Objects;<% if (databaseType == 'cassandra') { %>
+import java.util.Objects;<% if (databaseType === 'cassandra') { %>
 import java.util.UUID;<% } %><% Object.keys(uniqueEnums).forEach(function(element) { %>
 
 import <%=packageName%>.domain.enumeration.<%= element %>;<% }); %>
@@ -60,36 +65,38 @@ import <%=packageName%>.domain.enumeration.<%= element %>;<% }); %>
 <%- formatAsClassJavadoc(javadoc) %>
 @ApiModel(description = "<%- formatAsApiDescription(javadoc) %>")
 <% } -%>
-<% if (databaseType == 'sql') { -%>
+<% if (databaseType === 'sql') { -%>
 @Entity
-@Table(name = "<%= entityTableName %>")<% if (hibernateCache != 'no') { %>
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)<% } %><% } %><% if (databaseType == 'mongodb') { %>
-@Document(collection = "<%= entityTableName %>")<% } %><% if (databaseType == 'cassandra') { %>
-@Table(name = "<%= entityInstance %>")<% } %><% if (searchEngine == 'elasticsearch') { %>
+@Table(name = "<%= entityTableName %>")<% if (hibernateCache !== 'no') { %>
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)<% } %><% } %><% if (databaseType === 'mongodb') { %>
+@Document(collection = "<%= entityTableName %>")<% } %><% if (databaseType === 'cassandra') { %>
+@Table(name = "<%= entityInstance %>")<% } %><% if (searchEngine === 'elasticsearch') { %>
 @Document(indexName = "<%= entityInstance.toLowerCase() %>")<% } %>
 public class <%= entityClass %> <% if (entityParentClassName != 'no') { -%>extends <%= entityParentClassName %> <% } %> implements Serializable {
 
     private static final long serialVersionUID = 1L;
-<% if (databaseType == 'sql') { %>
+<% if (databaseType === 'sql') { %>
     @Id
-    <%_ if (primaryKeyType == 'IDENTITY') { _%>
+    <%_ if (primaryKeyType === 'IDENTITY') { _%>
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    <%_ }  else if (primaryKeyType == 'SEQUENCE') { _%>
+    <%_ }  else if (primaryKeyType === 'SEQUENCE') { _%>
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
     @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
-    <%_ } else if (primaryKeyType == 'UUID') {_%>
+    <%_ } else if (primaryKeyType === 'UUID') {_%>
     @GeneratedValue(generator="system-uuid")
     @GenericGenerator(name="system-uuid", strategy = "uuid2")
     private String id;<% }} %><% if (databaseType == 'mongodb') { %>
+    <%_ } _%>
+    private Long id;<% } %><% if (databaseType === 'mongodb') { %>
     @Id
-    private String id;<% } %><% if (databaseType == 'cassandra') { %>
+    private String id;<% } %><% if (databaseType === 'cassandra') { %>
     @PartitionKey
     private UUID id;<% } %>
 
 <%_ for (idx in fields) {
-    if (typeof fields[idx].javadoc != 'undefined') { _%>
+    if (typeof fields[idx].javadoc !== 'undefined') { _%>
 <%- formatAsFieldJavadoc(fields[idx].javadoc) %>
     <%_ }
     let required = false;
@@ -101,8 +108,8 @@ public class <%= entityClass %> <% if (entityParentClassName != 'no') { -%>exten
     const fieldName = fields[idx].fieldName;
     const fieldNameUnderscored = fields[idx].fieldNameUnderscored;
     const fieldNameAsDatabaseColumn = fields[idx].fieldNameAsDatabaseColumn;
-    if (fieldValidate == true) {
-        if (fieldValidate == true && fieldValidateRules.indexOf('required') != -1) {
+    if (fieldValidate === true) {
+        if (fieldValidate === true && fieldValidateRules.indexOf('required') !== -1) {
             required = true;
         } _%>
     <%- include ../common/field_validators -%>
@@ -110,38 +117,38 @@ public class <%= entityClass %> <% if (entityParentClassName != 'no') { -%>exten
     <%_ if (typeof fields[idx].javadoc != 'undefined') { _%>
     @ApiModelProperty(value = "<%- formatAsApiDescription(fields[idx].javadoc) %>"<% if (required) { %>, required = true<% } %>)
     <%_ } _%>
-    <%_ if (databaseType == 'sql') {
+    <%_ if (databaseType === 'sql') {
         if (fields[idx].fieldIsEnum) { _%>
     @Enumerated(EnumType.STRING)
         <%_ }
-        if (fieldType == 'byte[]') { _%>
+        if (fieldType === 'byte[]') { _%>
     @Lob
         <%_ }
         if (['Instant', 'ZonedDateTime', 'LocalDate'].includes(fieldType)) { _%>
     @Column(name = "<%-fieldNameAsDatabaseColumn %>"<% if (required) { %>, nullable = false<% } %>)
-        <%_ } else if (fieldType == 'BigDecimal') { _%>
+        <%_ } else if (fieldType === 'BigDecimal') { _%>
     @Column(name = "<%-fieldNameAsDatabaseColumn %>", precision=10, scale=2<% if (required) { %>, nullable = false<% } %>)
         <%_ } else { _%>
-    @Column(name = "<%-fieldNameAsDatabaseColumn %>"<% if (fieldValidate == true) { %><% if (fieldValidateRules.indexOf('maxlength') != -1) { %>, length = <%= fieldValidateRulesMaxlength %><% } %><% if (required) { %>, nullable = false<% } %><% } %>)
+    @Column(name = "<%-fieldNameAsDatabaseColumn %>"<% if (fieldValidate === true) { %><% if (fieldValidateRules.indexOf('maxlength') !== -1) { %>, length = <%= fieldValidateRulesMaxlength %><% } %><% if (required) { %>, nullable = false<% } %><% } %>)
     <%_     }
         } _%>
-    <%_ if (databaseType == 'mongodb') { _%>
+    <%_ if (databaseType === 'mongodb') { _%>
     @Field("<%=fieldNameUnderscored %>")
     <%_ } _%>
-    <%_ if (fieldTypeBlobContent != 'text') { _%>
+    <%_ if (fieldTypeBlobContent !== 'text') { _%>
     private <%= fieldType %> <%= fieldName %>;
     <%_ } else { _%>
     private String <%= fieldName %>;
     <%_ } _%>
 
-    <%_ if ((fieldType === 'byte[]' || fieldType === 'ByteBuffer') && fieldTypeBlobContent != 'text') { _%>
-      <%_ if (databaseType == 'sql' || databaseType === 'cassandra') { _%>
+    <%_ if ((fieldType === 'byte[]' || fieldType === 'ByteBuffer') && fieldTypeBlobContent !== 'text') { _%>
+      <%_ if (databaseType === 'sql' || databaseType === 'cassandra') { _%>
     @Column(name = "<%-fieldNameAsDatabaseColumn %>_content_type"<% if (required && databaseType !== 'cassandra') { %>, nullable = false<% } %>)
         <%_ if (required && databaseType === 'cassandra') { _%>
     @NotNull
         <%_ } _%>
       <%_ } _%>
-      <%_ if (databaseType == 'mongodb') { _%>
+      <%_ if (databaseType === 'mongodb') { _%>
     @Field("<%=fieldNameUnderscored %>_content_type")
       <%_ } _%>
     private String <%= fieldName %>ContentType;
@@ -161,36 +168,36 @@ public class <%= entityClass %> <% if (entityParentClassName != 'no') { -%>exten
         const relationshipRequired = relationships[idx].relationshipRequired;
         const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
         const ownerSide = relationships[idx].ownerSide;
-        if (otherEntityRelationshipName != null) {
+        if (otherEntityRelationshipName) {
             mappedBy = otherEntityRelationshipName.charAt(0).toLowerCase() + otherEntityRelationshipName.slice(1)
         }
         if (typeof relationships[idx].javadoc != 'undefined') { _%>
 <%- formatAsFieldJavadoc(relationships[idx].javadoc) %>
     @ApiModelProperty(value = "<%- formatAsApiDescription(relationships[idx].javadoc) %>")
     <%_ }
-        if (relationshipType == 'one-to-many') {
+        if (relationshipType === 'one-to-many') {
     _%>
     @OneToMany(mappedBy = "<%= otherEntityRelationshipName %>")
     @JsonIgnore
-    <%_     if (hibernateCache != 'no') { _%>
+    <%_     if (hibernateCache !== 'no') { _%>
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     <%_     } _%>
     private Set<<%= otherEntityNameCapitalized %>> <%= relationshipFieldNamePlural %> = new HashSet<>();
 
-    <%_ } else if (relationshipType == 'many-to-one') { _%>
+    <%_ } else if (relationshipType === 'many-to-one') { _%>
     @ManyToOne<% if (relationshipRequired) { %>(optional = false)<% } %>
     <%_ if (relationshipValidate) { _%>
     <%- include relationship_validators -%>
     <%_ }_%>
     private <%= otherEntityNameCapitalized %> <%= relationshipFieldName %>;
 
-    <%_ } else if (relationshipType == 'many-to-many') { _%>
-    @ManyToMany<% if (ownerSide == false) { %>(mappedBy = "<%= otherEntityRelationshipNamePlural %>")
+    <%_ } else if (relationshipType === 'many-to-many') { _%>
+    @ManyToMany<% if (ownerSide === false) { %>(mappedBy = "<%= otherEntityRelationshipNamePlural %>")
     @JsonIgnore<% } %>
-    <%_     if (hibernateCache != 'no') { _%>
+    <%_     if (hibernateCache !== 'no') { _%>
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     <%_     }
-            if (ownerSide == true) { _%>
+            if (ownerSide === true) { _%>
     <%_ if (relationshipValidate) { _%>
     <%- include relationship_validators -%>
     <%_ }_%>
@@ -214,11 +221,12 @@ public class <%= entityClass %> <% if (entityParentClassName != 'no') { -%>exten
     private <%= otherEntityNameCapitalized %> <%= relationshipFieldName %>;
 
     <%_ } } _%>
-    public <% if (databaseType == 'sql') { %><%= pkType %><% } %><% if (databaseType == 'mongodb') { %>String<% } %><% if (databaseType == 'cassandra') { %>UUID<% } %> getId() {
+
+    public <% if (databaseType === 'sql') { %><%= pkType %><% } %><% if (databaseType === 'mongodb') { %>String<% } %><% if (databaseType === 'cassandra') { %>UUID<% } %> getId() {
         return id;
     }
 
-    public void setId(<% if (databaseType == 'sql') { %><%= pkType %><% } %><% if (databaseType == 'mongodb') { %>String<% } %><% if (databaseType == 'cassandra') { %>UUID<% } %> id) {
+    public void setId(<% if (databaseType === 'sql') { %><%= pkType %><% } %><% if (databaseType === 'mongodb') { %>String<% } %><% if (databaseType === 'cassandra') { %>UUID<% } %> id) {
         this.id = id;
     }
 <%_ for (idx in fields) {
@@ -227,8 +235,8 @@ public class <%= entityClass %> <% if (entityParentClassName != 'no') { -%>exten
         const fieldName = fields[idx].fieldName;
         const fieldInJavaBeanMethod = fields[idx].fieldInJavaBeanMethod; _%>
 
-    <%_ if (fieldTypeBlobContent != 'text') { _%>
-    public <%= fieldType %> <% if (fieldType.toLowerCase() == 'boolean') { %>is<% } else { %>get<%_ } _%><%= fieldInJavaBeanMethod %>() {
+    <%_ if (fieldTypeBlobContent !== 'text') { _%>
+    public <%= fieldType %> <% if (fieldType.toLowerCase() === 'boolean') { %>is<% } else { %>get<%_ } _%><%= fieldInJavaBeanMethod %>() {
     <%_ } else { _%>
     public String get<%= fieldInJavaBeanMethod %>() {
     <%_ } _%>
@@ -236,7 +244,7 @@ public class <%= entityClass %> <% if (entityParentClassName != 'no') { -%>exten
     }
     <%_ if (fluentMethods) { _%>
 
-        <%_ if (fieldTypeBlobContent != 'text') { _%>
+        <%_ if (fieldTypeBlobContent !== 'text') { _%>
     public <%= entityClass %> <%= fieldName %>(<%= fieldType %> <%= fieldName %>) {
         <%_ } else { _%>
     public <%= entityClass %> <%= fieldName %>(String <%= fieldName %>) {
@@ -246,14 +254,14 @@ public class <%= entityClass %> <% if (entityParentClassName != 'no') { -%>exten
     }
     <%_ } _%>
 
-    <%_ if (fieldTypeBlobContent != 'text') { _%>
+    <%_ if (fieldTypeBlobContent !== 'text') { _%>
     public void set<%= fieldInJavaBeanMethod %>(<%= fieldType %> <%= fieldName %>) {
     <%_ } else { _%>
     public void set<%= fieldInJavaBeanMethod %>(String <%= fieldName %>) {
     <%_ } _%>
         this.<%= fieldName %> = <%= fieldName %>;
     }
-    <%_ if ((fieldType == 'byte[]' || fieldType === 'ByteBuffer') && fieldTypeBlobContent != 'text') { _%>
+    <%_ if ((fieldType === 'byte[]' || fieldType === 'ByteBuffer') && fieldTypeBlobContent !== 'text') { _%>
 
     public String get<%= fieldInJavaBeanMethod %>ContentType() {
         return <%= fieldName %>ContentType;
@@ -284,7 +292,7 @@ public class <%= entityClass %> <% if (entityParentClassName != 'no') { -%>exten
         const otherEntityRelationshipNameCapitalized = relationships[idx].otherEntityRelationshipNameCapitalized;
         const otherEntityRelationshipNameCapitalizedPlural = relationships[idx].otherEntityRelationshipNameCapitalizedPlural;
     _%>
-    <%_ if (relationshipType == 'one-to-many' || relationshipType == 'many-to-many') { _%>
+    <%_ if (relationshipType === 'one-to-many' || relationshipType === 'many-to-many') { _%>
 
     public Set<<%= otherEntityNameCapitalized %>> get<%= relationshipNameCapitalizedPlural %>() {
         return <%= relationshipFieldNamePlural %>;
@@ -298,9 +306,9 @@ public class <%= entityClass %> <% if (entityParentClassName != 'no') { -%>exten
 
     public <%= entityClass %> add<%= relationshipNameCapitalized %>(<%= otherEntityNameCapitalized %> <%= otherEntityName %>) {
         this.<%= relationshipFieldNamePlural %>.add(<%= otherEntityName %>);
-            <%_ if (relationshipType == 'one-to-many') { _%>
+            <%_ if (relationshipType === 'one-to-many') { _%>
         <%= otherEntityName %>.set<%= otherEntityRelationshipNameCapitalized %>(this);
-            <%_ } else if (otherEntityRelationshipNameCapitalizedPlural != '' && relationshipType == 'many-to-many') {
+            <%_ } else if (otherEntityRelationshipNameCapitalizedPlural !== '' && relationshipType === 'many-to-many') {
                 // JHipster version < 3.6.0 didn't ask for this relationship name _%>
         <%= otherEntityName %>.get<%= otherEntityRelationshipNameCapitalizedPlural %>().add(this);
             <%_ } _%>
@@ -309,9 +317,9 @@ public class <%= entityClass %> <% if (entityParentClassName != 'no') { -%>exten
 
     public <%= entityClass %> remove<%= relationshipNameCapitalized %>(<%= otherEntityNameCapitalized %> <%= otherEntityName %>) {
         this.<%= relationshipFieldNamePlural %>.remove(<%= otherEntityName %>);
-            <%_ if (relationshipType == 'one-to-many') { _%>
+            <%_ if (relationshipType === 'one-to-many') { _%>
         <%= otherEntityName %>.set<%= otherEntityRelationshipNameCapitalized %>(null);
-            <%_ } else if (otherEntityRelationshipNameCapitalizedPlural != '' && relationshipType == 'many-to-many') {
+            <%_ } else if (otherEntityRelationshipNameCapitalizedPlural !== '' && relationshipType === 'many-to-many') {
                 // JHipster version < 3.6.0 didn't ask for this relationship name _%>
         <%= otherEntityName %>.get<%= otherEntityRelationshipNameCapitalizedPlural %>().remove(this);
             <%_ } _%>
@@ -370,8 +378,8 @@ public class <%= entityClass %> <% if (entityParentClassName != 'no') { -%>exten
                 const fieldTypeBlobContent = fields[idx].fieldTypeBlobContent;
                 const fieldName = fields[idx].fieldName;
                 const fieldNameCapitalized = fieldName.charAt(0).toUpperCase() + fieldName.slice(1) _%>
-            ", <%= fieldName %>='" + <% if (fieldType.toLowerCase() == 'boolean') { %>is<% } else { %>get<%_ } _%><%= fieldNameCapitalized %>() + "'" +
-                <%_ if ((fieldType == 'byte[]' || fieldType === 'ByteBuffer') && fieldTypeBlobContent != 'text') { _%>
+            ", <%= fieldName %>='" + <% if (fieldType.toLowerCase() === 'boolean') { %>is<% } else { %>get<%_ } _%><%= fieldNameCapitalized %>() + "'" +
+                <%_ if ((fieldType === 'byte[]' || fieldType === 'ByteBuffer') && fieldTypeBlobContent !== 'text') { _%>
             ", <%= fieldName %>ContentType='" + <%= fieldName %>ContentType + "'" +
                 <%_ } _%>
             <%_ } _%>
